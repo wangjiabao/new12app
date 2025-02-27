@@ -126,6 +126,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/app_server/create_address:
+        post:
+            tags:
+                - App
+            operationId: App_CreateAddress
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateAddressRequest_SendBody'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateAddressReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/app_server/delete_balance_reward:
         post:
             tags:
@@ -268,7 +292,7 @@ paths:
         get:
             tags:
                 - App
-            operationId: App_RecommendList
+            operationId: App_UserRecommend
             parameters:
                 - name: address
                   in: query
@@ -487,6 +511,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/app_server/update_address:
+        post:
+            tags:
+                - App
+            operationId: App_UpdateAddress
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateAddressRequest_SendBody'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateAddressReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/app_server/user_area:
         get:
             tags:
@@ -602,6 +650,32 @@ components:
                     type: string
                 publicKey:
                     type: string
+                addressId:
+                    type: string
+                goodId:
+                    type: string
+        CreateAddressReply:
+            type: object
+            properties:
+                status:
+                    type: string
+        CreateAddressRequest_SendBody:
+            type: object
+            properties:
+                a:
+                    type: string
+                b:
+                    type: string
+                c:
+                    type: string
+                d:
+                    type: string
+                phone:
+                    type: string
+                sign:
+                    type: string
+                publicKey:
+                    type: string
         DeleteBalanceRewardReply:
             type: object
             properties:
@@ -696,9 +770,9 @@ components:
         RecommendListReply:
             type: object
             properties:
-                totalNum:
+                myLevel:
                     type: string
-                totalTeamNum:
+                totalMyAmount:
                     type: string
                 totalAmount:
                     type: number
@@ -715,6 +789,8 @@ components:
                 amount:
                     type: number
                     format: double
+                myLevel:
+                    type: string
                 createdAt:
                     type: string
         RecommendRewardListReply:
@@ -844,6 +920,32 @@ components:
                     type: string
                 password:
                     type: string
+        UpdateAddressReply:
+            type: object
+            properties:
+                status:
+                    type: string
+        UpdateAddressRequest_SendBody:
+            type: object
+            properties:
+                id:
+                    type: string
+                a:
+                    type: string
+                b:
+                    type: string
+                c:
+                    type: string
+                d:
+                    type: string
+                phone:
+                    type: string
+                status:
+                    type: string
+                sign:
+                    type: string
+                publicKey:
+                    type: string
         UserAreaReply:
             type: object
             properties:
@@ -863,29 +965,18 @@ components:
         UserInfoReply:
             type: object
             properties:
-                one:
-                    type: number
-                    format: double
-                two:
-                    type: number
-                    format: double
-                three:
-                    type: number
-                    format: double
-                todayTotal:
-                    type: number
-                    format: double
-                listEthTotal:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListEthRecordTotal'
                 bPrice:
                     type: number
                     format: double
-                exchangeRate:
-                    type: number
-                    format: double
-                balanceRaw:
+                address:
+                    type: string
+                inviteUserAddress:
+                    type: string
+                addressTwo:
+                    type: string
+                amount:
+                    type: string
+                balanceNana:
                     type: number
                     format: double
                 balanceUsdt:
@@ -897,68 +988,72 @@ components:
                 withdrawMin:
                     type: number
                     format: double
-                listEth:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListEthRecord'
-                listBuy:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListBuy'
-                listWithdraw:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListWithdraw'
-                listExchange:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListExchange'
-                listTo:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListTo'
-                listStake:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListStake'
-                listReward:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/UserInfoReply_ListReward'
-                level:
-                    type: string
-                myAddress:
-                    type: string
-                inviteUserAddress:
-                    type: string
+                withdrawMaxNa:
+                    type: number
+                    format: double
+                withdrawMinNa:
+                    type: number
+                    format: double
                 amoutUsdtGet:
                     type: number
                     format: double
                 amoutUsdtSubGet:
                     type: number
                     format: double
+                amoutUsdtSubGetToday:
+                    type: number
+                    format: double
                 amoutUsdt:
-                    type: number
-                    format: double
-                rewardOne:
-                    type: number
-                    format: double
-                rewardTwo:
                     type: number
                     format: double
                 rewardThree:
                     type: number
                     format: double
-                rewardFour:
+                amoutUsdtSubGetAll:
                     type: number
                     format: double
-                rewardFive:
+                teamAll:
                     type: number
                     format: double
-                listOut:
+                listEth:
                     type: array
                     items:
-                        $ref: '#/components/schemas/UserInfoReply_ListOut'
+                        $ref: '#/components/schemas/UserInfoReply_ListEthRecord'
+                listAddress:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfoReply_ListAddress'
+                listBuy:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfoReply_ListBuy'
+                listExchange:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfoReply_ListExchange'
+                listReward:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfoReply_ListReward'
+        UserInfoReply_ListAddress:
+            type: object
+            properties:
+                id:
+                    type: string
+                phone:
+                    type: string
+                a:
+                    type: string
+                b:
+                    type: string
+                c:
+                    type: string
+                d:
+                    type: string
+                status:
+                    type: string
+                createdAt:
+                    type: string
         UserInfoReply_ListBuy:
             type: object
             properties:
@@ -966,6 +1061,12 @@ components:
                     type: number
                     format: double
                 createdAt:
+                    type: string
+                goodId:
+                    type: string
+                addressId:
+                    type: string
+                status:
                     type: string
         UserInfoReply_ListEthRecord:
             type: object
@@ -975,36 +1076,13 @@ components:
                     format: double
                 createdAt:
                     type: string
-        UserInfoReply_ListEthRecordTotal:
-            type: object
-            properties:
-                amount:
-                    type: number
-                    format: double
-                address:
-                    type: string
-                createdAt:
-                    type: string
         UserInfoReply_ListExchange:
             type: object
             properties:
-                amountRaw:
+                amountUsdt:
                     type: number
                     format: double
-                amountRsdt:
-                    type: number
-                    format: double
-                createdAt:
-                    type: string
-        UserInfoReply_ListOut:
-            type: object
-            properties:
-                amount:
-                    type: number
-                    format: double
-                level:
-                    type: string
-                amountGet:
+                amountNa:
                     type: number
                     format: double
                 createdAt:
@@ -1012,42 +1090,15 @@ components:
         UserInfoReply_ListReward:
             type: object
             properties:
-                amount:
+                amountUsdt:
+                    type: number
+                    format: double
+                amountNa:
                     type: number
                     format: double
                 rewardType:
                     type: string
                 createdAt:
-                    type: string
-        UserInfoReply_ListStake:
-            type: object
-            properties:
-                amount:
-                    type: number
-                    format: double
-                createdAt:
-                    type: string
-        UserInfoReply_ListTo:
-            type: object
-            properties:
-                amount:
-                    type: number
-                    format: double
-                toAddress:
-                    type: string
-                toType:
-                    type: string
-                createdAt:
-                    type: string
-        UserInfoReply_ListWithdraw:
-            type: object
-            properties:
-                amount:
-                    type: number
-                    format: double
-                address:
-                    type: string
-                createAt:
                     type: string
         WithdrawListReply:
             type: object

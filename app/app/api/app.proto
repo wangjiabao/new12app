@@ -78,6 +78,12 @@ service App {
 		};
 	};
 
+	rpc UserRecommend (RecommendListRequest) returns (RecommendListReply) {
+		option (google.api.http) = {
+			get: "/api/app_server/recommend_list"
+		};
+	};
+
 	rpc PasswordChange (PasswordChangeRequest) returns (PasswordChangeReply) {
 		option (google.api.http) = {
 			post: "/api/app_server/password_change"
@@ -194,6 +200,20 @@ service App {
 			body: "send_body"
 		};
 	};
+
+	rpc CreateAddress (CreateAddressRequest) returns (CreateAddressReply) {
+		option (google.api.http) = {
+			post: "/api/app_server/create_address"
+			body: "send_body"
+		};
+	};
+
+	rpc UpdateAddress (UpdateAddressRequest) returns (UpdateAddressReply) {
+		option (google.api.http) = {
+			post: "/api/app_server/update_address"
+			body: "send_body"
+		};
+	};
 //
 //	rpc AdminAll (AdminAllRequest) returns (AdminAllReply) {
 //		option (google.api.http) = {
@@ -234,12 +254,52 @@ message BuyRequest {
 		uint64 type = 2;
 		string sign = 4;
 		string publicKey = 5;
+		uint64 addressId = 6;
+		uint64 goodId = 7;
 	}
 
 	SendBody send_body = 1;
 }
 
 message BuyReply {
+	string status = 1;
+}
+
+message CreateAddressRequest {
+	message SendBody{
+		string a = 1;
+		string b = 2;
+		string c = 4;
+		string d = 5;
+		string phone = 6;
+		string sign = 7;
+		string publicKey = 8;
+	}
+
+	SendBody send_body = 1;
+}
+
+message CreateAddressReply {
+	string status = 1;
+}
+
+message UpdateAddressRequest {
+	message SendBody{
+		uint64 id = 10;
+		string a = 1;
+		string b = 2;
+		string c = 4;
+		string d = 5;
+		string phone = 6;
+		uint64 status = 7;
+		string sign = 9;
+		string publicKey = 8;
+	}
+
+	SendBody send_body = 1;
+}
+
+message UpdateAddressReply {
 	string status = 1;
 }
 
@@ -298,24 +358,26 @@ message UserInfoRequest {
 }
 
 message UserInfoReply {
-
-	double one = 11; // 销毁总量
-	double two = 12; // Ai算力总量
-	double three = 13; // 持币生息总量
-	double todayTotal = 18; //今日奖励ai
-	repeated ListEthRecordTotal listEthTotal = 116; // 充值轮播记录
-	message ListEthRecordTotal {
-		double amount = 1; // 金额
-		string address = 3; // 地址
-		string createdAt = 2; // 时间
-	}
-
-	double bPrice = 1; // raw价格
-	double exchangeRate = 6; // 兑换手续费
-	double balanceRaw = 2; // raw余额
-	double balanceUsdt = 3; // rsdt余额
+	double bPrice = 1; // nana价格
+	string address = 2; // 地址
+	string inviteUserAddress = 11; // 我的直推人地址
+	string addressTwo = 6; // 充值地址
+	uint64 amount = 4; // 充值usdt余额
+	double balanceNana = 3; // nana余额
+	double balanceUsdt = 5; // usdt余额
 	double withdrawMax = 52; // 最大提现金额
 	double withdrawMin = 53; // 最小提现金额
+	double withdrawMaxNa = 51; // nana最大提现金额
+	double withdrawMinNa = 54; // nana最小提现金额
+
+	double amoutUsdtGet = 8; // 已释放
+	double amoutUsdtSubGet = 9; // 待释放
+	double amoutUsdtSubGetToday = 10; // 今日待释放
+	double amoutUsdt = 31; // 认购金额
+	double rewardThree = 43; // 团队业绩
+
+	double amoutUsdtSubGetAll = 41; // 静态收益
+	double teamAll = 42; // 团队收益
 
 	repeated ListEthRecord listEth = 117; // 充值记录
 	message ListEthRecord {
@@ -323,64 +385,39 @@ message UserInfoReply {
 		string createdAt = 2; // 时间
 	}
 
+	repeated ListAddress listAddress = 115; // 认购记录
+	message ListAddress {
+		uint64 id = 10;
+		string phone = 5; // 手机
+		string a = 1; // 省
+		string b = 2; // 市
+		string c = 3; // 区
+		string d = 6; // 详细
+		uint64 status = 7; // 状态1默认
+		string createdAt = 4; // 时间
+	}
+
 	repeated ListBuy listBuy = 118; // 认购记录
 	message ListBuy {
 		double amount = 1; // 金额
 		string createdAt = 2; // 时间
+		uint64 goodId = 3; // 商品id
+		uint64 addressId = 6; // 地址信息id
+		uint64 status = 4; // 状态1 //已完成3，待发货1，待收货2
 	}
 
-	repeated ListWithdraw listWithdraw = 119; // 提现列表
-	message ListWithdraw {
-		double amount = 2; // 提现金额
-		string address = 3; // 提现地址
-		string createAt = 1; // 提现时间
-	}
-
-	repeated ListExchange listExchange = 120; // rsdt兑换raw记录
+	repeated ListExchange listExchange = 120; // rsdt兑换nana记录
 	message ListExchange {
-		double amountRaw = 1; // raw金额
-		double amountRsdt = 2; // rsdt金额
-		string createdAt = 3; // 时间
-	}
-
-	repeated ListTo listTo = 130; // 划转记录
-	message ListTo {
-		double amount = 1; // 金额
-		string toAddress = 4; // 目标地址
-		uint64 toType = 2; // 划转类型:1划转
-		string createdAt = 3; // 时间
-	}
-
-	repeated ListStake listStake = 131; // 质押记录
-	message ListStake {
-		double amount = 1; // 金额
+		double amountUsdt = 1; // usdt金额
+		double amountNa = 2; // nana金额
 		string createdAt = 3; // 时间
 	}
 
 	repeated ListReward listReward = 121; // 收益记录
 	message ListReward {
-		double amount = 1; // rsdt金额
-		uint64 rewardType = 2; // 收益类型:1静态，2直推,3团队,4平级,5社区,6质押
-		string createdAt = 3; // 时间
-	}
-
-	uint64 level = 7; // 级别vip
-	string myAddress = 4; // 我的地址
-	string inviteUserAddress = 5; // 我的直推人地址
-	double amoutUsdtGet = 8; // 已产出算力
-	double amoutUsdtSubGet = 9; // 剩余产出算力
-	double amoutUsdt = 31; // 算力数量
-	double rewardOne = 41; // 静态奖金
-	double rewardTwo = 42; // 直推奖
-	double rewardThree = 43; // 团队奖金
-	double rewardFour = 44; // 平级奖金
-	double rewardFive = 45; // 社区奖金
-
-	repeated ListOut listOut = 135; // 收益记录
-	message ListOut {
-		double amount = 1; // rsdt金额
-		uint64 level = 4; // 倍数
-		double amountGet = 5; // 已产出
+		double amountUsdt = 1; // usdt金额
+		double amountNa = 4; // nana金额
+		uint64 rewardType = 2; // 收益类型:1节点，2推荐,3推荐2代,4团队,5平级,6提现,7提现nana,8报单
 		string createdAt = 3; // 时间
 	}
 }
@@ -481,13 +518,14 @@ message RecommendListRequest {
 }
 
 message RecommendListReply {
-	uint64 totalNum = 2; // 直推人数
-	uint64 totalTeamNum = 3; // 团队总人数
+	uint64 myLevel = 1; // 等级
+	uint64 totalMyAmount = 3; // 个人业绩
 	double totalAmount = 4; // 团队总业绩
-	repeated List recommends = 1;
+	repeated List recommends = 2;
 	message List {
 		string address = 1;
-		double amount = 2;
+		double amount = 2; // 团队业绩
+		uint64 myLevel = 4; // 等级
 		string created_at = 3;
 	}
 }

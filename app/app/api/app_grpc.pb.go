@@ -30,6 +30,7 @@ const (
 	App_TradeList_FullMethodName           = "/api.App/TradeList"
 	App_TranList_FullMethodName            = "/api.App/TranList"
 	App_RecommendList_FullMethodName       = "/api.App/RecommendList"
+	App_UserRecommend_FullMethodName       = "/api.App/UserRecommend"
 	App_PasswordChange_FullMethodName      = "/api.App/PasswordChange"
 	App_Withdraw_FullMethodName            = "/api.App/Withdraw"
 	App_Exchange_FullMethodName            = "/api.App/Exchange"
@@ -44,6 +45,8 @@ const (
 	App_AdminFee_FullMethodName            = "/api.App/AdminFee"
 	App_TokenWithdraw_FullMethodName       = "/api.App/TokenWithdraw"
 	App_Buy_FullMethodName                 = "/api.App/Buy"
+	App_CreateAddress_FullMethodName       = "/api.App/CreateAddress"
+	App_UpdateAddress_FullMethodName       = "/api.App/UpdateAddress"
 )
 
 // AppClient is the client API for App service.
@@ -61,6 +64,7 @@ type AppClient interface {
 	TradeList(ctx context.Context, in *TradeListRequest, opts ...grpc.CallOption) (*TradeListReply, error)
 	TranList(ctx context.Context, in *TranListRequest, opts ...grpc.CallOption) (*TranListReply, error)
 	RecommendList(ctx context.Context, in *RecommendListRequest, opts ...grpc.CallOption) (*RecommendListReply, error)
+	UserRecommend(ctx context.Context, in *RecommendListRequest, opts ...grpc.CallOption) (*RecommendListReply, error)
 	PasswordChange(ctx context.Context, in *PasswordChangeRequest, opts ...grpc.CallOption) (*PasswordChangeReply, error)
 	Withdraw(ctx context.Context, in *WithdrawRequest, opts ...grpc.CallOption) (*WithdrawReply, error)
 	Exchange(ctx context.Context, in *ExchangeRequest, opts ...grpc.CallOption) (*ExchangeReply, error)
@@ -98,6 +102,8 @@ type AppClient interface {
 	AdminFee(ctx context.Context, in *AdminFeeRequest, opts ...grpc.CallOption) (*AdminFeeReply, error)
 	TokenWithdraw(ctx context.Context, in *TokenWithdrawRequest, opts ...grpc.CallOption) (*TokenWithdrawReply, error)
 	Buy(ctx context.Context, in *BuyRequest, opts ...grpc.CallOption) (*BuyReply, error)
+	CreateAddress(ctx context.Context, in *CreateAddressRequest, opts ...grpc.CallOption) (*CreateAddressReply, error)
+	UpdateAddress(ctx context.Context, in *UpdateAddressRequest, opts ...grpc.CallOption) (*UpdateAddressReply, error)
 }
 
 type appClient struct {
@@ -201,6 +207,15 @@ func (c *appClient) TranList(ctx context.Context, in *TranListRequest, opts ...g
 func (c *appClient) RecommendList(ctx context.Context, in *RecommendListRequest, opts ...grpc.CallOption) (*RecommendListReply, error) {
 	out := new(RecommendListReply)
 	err := c.cc.Invoke(ctx, App_RecommendList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appClient) UserRecommend(ctx context.Context, in *RecommendListRequest, opts ...grpc.CallOption) (*RecommendListReply, error) {
+	out := new(RecommendListReply)
+	err := c.cc.Invoke(ctx, App_UserRecommend_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -333,6 +348,24 @@ func (c *appClient) Buy(ctx context.Context, in *BuyRequest, opts ...grpc.CallOp
 	return out, nil
 }
 
+func (c *appClient) CreateAddress(ctx context.Context, in *CreateAddressRequest, opts ...grpc.CallOption) (*CreateAddressReply, error) {
+	out := new(CreateAddressReply)
+	err := c.cc.Invoke(ctx, App_CreateAddress_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *appClient) UpdateAddress(ctx context.Context, in *UpdateAddressRequest, opts ...grpc.CallOption) (*UpdateAddressReply, error) {
+	out := new(UpdateAddressReply)
+	err := c.cc.Invoke(ctx, App_UpdateAddress_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AppServer is the server API for App service.
 // All implementations must embed UnimplementedAppServer
 // for forward compatibility
@@ -348,6 +381,7 @@ type AppServer interface {
 	TradeList(context.Context, *TradeListRequest) (*TradeListReply, error)
 	TranList(context.Context, *TranListRequest) (*TranListReply, error)
 	RecommendList(context.Context, *RecommendListRequest) (*RecommendListReply, error)
+	UserRecommend(context.Context, *RecommendListRequest) (*RecommendListReply, error)
 	PasswordChange(context.Context, *PasswordChangeRequest) (*PasswordChangeReply, error)
 	Withdraw(context.Context, *WithdrawRequest) (*WithdrawReply, error)
 	Exchange(context.Context, *ExchangeRequest) (*ExchangeReply, error)
@@ -385,6 +419,8 @@ type AppServer interface {
 	AdminFee(context.Context, *AdminFeeRequest) (*AdminFeeReply, error)
 	TokenWithdraw(context.Context, *TokenWithdrawRequest) (*TokenWithdrawReply, error)
 	Buy(context.Context, *BuyRequest) (*BuyReply, error)
+	CreateAddress(context.Context, *CreateAddressRequest) (*CreateAddressReply, error)
+	UpdateAddress(context.Context, *UpdateAddressRequest) (*UpdateAddressReply, error)
 	mustEmbedUnimplementedAppServer()
 }
 
@@ -424,6 +460,9 @@ func (UnimplementedAppServer) TranList(context.Context, *TranListRequest) (*Tran
 }
 func (UnimplementedAppServer) RecommendList(context.Context, *RecommendListRequest) (*RecommendListReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecommendList not implemented")
+}
+func (UnimplementedAppServer) UserRecommend(context.Context, *RecommendListRequest) (*RecommendListReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UserRecommend not implemented")
 }
 func (UnimplementedAppServer) PasswordChange(context.Context, *PasswordChangeRequest) (*PasswordChangeReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PasswordChange not implemented")
@@ -466,6 +505,12 @@ func (UnimplementedAppServer) TokenWithdraw(context.Context, *TokenWithdrawReque
 }
 func (UnimplementedAppServer) Buy(context.Context, *BuyRequest) (*BuyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Buy not implemented")
+}
+func (UnimplementedAppServer) CreateAddress(context.Context, *CreateAddressRequest) (*CreateAddressReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAddress not implemented")
+}
+func (UnimplementedAppServer) UpdateAddress(context.Context, *UpdateAddressRequest) (*UpdateAddressReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAddress not implemented")
 }
 func (UnimplementedAppServer) mustEmbedUnimplementedAppServer() {}
 
@@ -674,6 +719,24 @@ func _App_RecommendList_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AppServer).RecommendList(ctx, req.(*RecommendListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _App_UserRecommend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecommendListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).UserRecommend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_UserRecommend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).UserRecommend(ctx, req.(*RecommendListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -930,6 +993,42 @@ func _App_Buy_Handler(srv interface{}, ctx context.Context, dec func(interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
+func _App_CreateAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).CreateAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_CreateAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).CreateAddress(ctx, req.(*CreateAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _App_UpdateAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).UpdateAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_UpdateAddress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).UpdateAddress(ctx, req.(*UpdateAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // App_ServiceDesc is the grpc.ServiceDesc for App service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -980,6 +1079,10 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RecommendList",
 			Handler:    _App_RecommendList_Handler,
+		},
+		{
+			MethodName: "UserRecommend",
+			Handler:    _App_UserRecommend_Handler,
 		},
 		{
 			MethodName: "PasswordChange",
@@ -1036,6 +1139,14 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Buy",
 			Handler:    _App_Buy_Handler,
+		},
+		{
+			MethodName: "CreateAddress",
+			Handler:    _App_CreateAddress_Handler,
+		},
+		{
+			MethodName: "UpdateAddress",
+			Handler:    _App_UpdateAddress_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

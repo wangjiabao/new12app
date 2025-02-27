@@ -23,6 +23,7 @@ const OperationAppAdminFee = "/api.App/AdminFee"
 const OperationAppAdminWithdraw = "/api.App/AdminWithdraw"
 const OperationAppAdminWithdrawEth = "/api.App/AdminWithdrawEth"
 const OperationAppBuy = "/api.App/Buy"
+const OperationAppCreateAddress = "/api.App/CreateAddress"
 const OperationAppDeleteBalanceReward = "/api.App/DeleteBalanceReward"
 const OperationAppDeposit = "/api.App/Deposit"
 const OperationAppEthAuthorize = "/api.App/EthAuthorize"
@@ -40,8 +41,10 @@ const OperationAppTrade = "/api.App/Trade"
 const OperationAppTradeList = "/api.App/TradeList"
 const OperationAppTran = "/api.App/Tran"
 const OperationAppTranList = "/api.App/TranList"
+const OperationAppUpdateAddress = "/api.App/UpdateAddress"
 const OperationAppUserArea = "/api.App/UserArea"
 const OperationAppUserInfo = "/api.App/UserInfo"
+const OperationAppUserRecommend = "/api.App/UserRecommend"
 const OperationAppWithdraw = "/api.App/Withdraw"
 const OperationAppWithdrawList = "/api.App/WithdrawList"
 
@@ -75,6 +78,7 @@ type AppHTTPServer interface {
 	AdminWithdraw(context.Context, *AdminWithdrawRequest) (*AdminWithdrawReply, error)
 	AdminWithdrawEth(context.Context, *AdminWithdrawEthRequest) (*AdminWithdrawEthReply, error)
 	Buy(context.Context, *BuyRequest) (*BuyReply, error)
+	CreateAddress(context.Context, *CreateAddressRequest) (*CreateAddressReply, error)
 	DeleteBalanceReward(context.Context, *DeleteBalanceRewardRequest) (*DeleteBalanceRewardReply, error)
 	Deposit(context.Context, *DepositRequest) (*DepositReply, error)
 	EthAuthorize(context.Context, *EthAuthorizeRequest) (*EthAuthorizeReply, error)
@@ -92,8 +96,10 @@ type AppHTTPServer interface {
 	TradeList(context.Context, *TradeListRequest) (*TradeListReply, error)
 	Tran(context.Context, *TranRequest) (*TranReply, error)
 	TranList(context.Context, *TranListRequest) (*TranListReply, error)
+	UpdateAddress(context.Context, *UpdateAddressRequest) (*UpdateAddressReply, error)
 	UserArea(context.Context, *UserAreaRequest) (*UserAreaReply, error)
 	UserInfo(context.Context, *UserInfoRequest) (*UserInfoReply, error)
+	UserRecommend(context.Context, *RecommendListRequest) (*RecommendListReply, error)
 	Withdraw(context.Context, *WithdrawRequest) (*WithdrawReply, error)
 	WithdrawList(context.Context, *WithdrawListRequest) (*WithdrawListReply, error)
 }
@@ -111,6 +117,7 @@ func RegisterAppHTTPServer(s *http.Server, srv AppHTTPServer) {
 	r.GET("/api/app_server/trade_list", _App_TradeList0_HTTP_Handler(srv))
 	r.GET("/api/app_server/tran_list", _App_TranList0_HTTP_Handler(srv))
 	r.GET("/api/app_server/recommend_list", _App_RecommendList0_HTTP_Handler(srv))
+	r.GET("/api/app_server/recommend_list", _App_UserRecommend0_HTTP_Handler(srv))
 	r.POST("/api/app_server/password_change", _App_PasswordChange0_HTTP_Handler(srv))
 	r.POST("/api/app_server/withdraw", _App_Withdraw0_HTTP_Handler(srv))
 	r.POST("/api/app_server/exchange", _App_Exchange0_HTTP_Handler(srv))
@@ -125,6 +132,8 @@ func RegisterAppHTTPServer(s *http.Server, srv AppHTTPServer) {
 	r.GET("/api/admin_dhb/fee", _App_AdminFee0_HTTP_Handler(srv))
 	r.GET("/api/app_server/token_withdraw", _App_TokenWithdraw0_HTTP_Handler(srv))
 	r.POST("/api/app_server/buy", _App_Buy0_HTTP_Handler(srv))
+	r.POST("/api/app_server/create_address", _App_CreateAddress0_HTTP_Handler(srv))
+	r.POST("/api/app_server/update_address", _App_UpdateAddress0_HTTP_Handler(srv))
 }
 
 func _App_EthAuthorize0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
@@ -332,6 +341,25 @@ func _App_RecommendList0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) 
 		http.SetOperation(ctx, OperationAppRecommendList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.RecommendList(ctx, req.(*RecommendListRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RecommendListReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _App_UserRecommend0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RecommendListRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAppUserRecommend)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UserRecommend(ctx, req.(*RecommendListRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -635,11 +663,56 @@ func _App_Buy0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
 	}
 }
 
+func _App_CreateAddress0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateAddressRequest
+		if err := ctx.Bind(&in.SendBody); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAppCreateAddress)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateAddress(ctx, req.(*CreateAddressRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateAddressReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _App_UpdateAddress0_HTTP_Handler(srv AppHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateAddressRequest
+		if err := ctx.Bind(&in.SendBody); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAppUpdateAddress)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateAddress(ctx, req.(*UpdateAddressRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateAddressReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AppHTTPClient interface {
 	AdminFee(ctx context.Context, req *AdminFeeRequest, opts ...http.CallOption) (rsp *AdminFeeReply, err error)
 	AdminWithdraw(ctx context.Context, req *AdminWithdrawRequest, opts ...http.CallOption) (rsp *AdminWithdrawReply, err error)
 	AdminWithdrawEth(ctx context.Context, req *AdminWithdrawEthRequest, opts ...http.CallOption) (rsp *AdminWithdrawEthReply, err error)
 	Buy(ctx context.Context, req *BuyRequest, opts ...http.CallOption) (rsp *BuyReply, err error)
+	CreateAddress(ctx context.Context, req *CreateAddressRequest, opts ...http.CallOption) (rsp *CreateAddressReply, err error)
 	DeleteBalanceReward(ctx context.Context, req *DeleteBalanceRewardRequest, opts ...http.CallOption) (rsp *DeleteBalanceRewardReply, err error)
 	Deposit(ctx context.Context, req *DepositRequest, opts ...http.CallOption) (rsp *DepositReply, err error)
 	EthAuthorize(ctx context.Context, req *EthAuthorizeRequest, opts ...http.CallOption) (rsp *EthAuthorizeReply, err error)
@@ -657,8 +730,10 @@ type AppHTTPClient interface {
 	TradeList(ctx context.Context, req *TradeListRequest, opts ...http.CallOption) (rsp *TradeListReply, err error)
 	Tran(ctx context.Context, req *TranRequest, opts ...http.CallOption) (rsp *TranReply, err error)
 	TranList(ctx context.Context, req *TranListRequest, opts ...http.CallOption) (rsp *TranListReply, err error)
+	UpdateAddress(ctx context.Context, req *UpdateAddressRequest, opts ...http.CallOption) (rsp *UpdateAddressReply, err error)
 	UserArea(ctx context.Context, req *UserAreaRequest, opts ...http.CallOption) (rsp *UserAreaReply, err error)
 	UserInfo(ctx context.Context, req *UserInfoRequest, opts ...http.CallOption) (rsp *UserInfoReply, err error)
+	UserRecommend(ctx context.Context, req *RecommendListRequest, opts ...http.CallOption) (rsp *RecommendListReply, err error)
 	Withdraw(ctx context.Context, req *WithdrawRequest, opts ...http.CallOption) (rsp *WithdrawReply, err error)
 	WithdrawList(ctx context.Context, req *WithdrawListRequest, opts ...http.CallOption) (rsp *WithdrawListReply, err error)
 }
@@ -715,6 +790,19 @@ func (c *AppHTTPClientImpl) Buy(ctx context.Context, in *BuyRequest, opts ...htt
 	pattern := "/api/app_server/buy"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAppBuy))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in.SendBody, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AppHTTPClientImpl) CreateAddress(ctx context.Context, in *CreateAddressRequest, opts ...http.CallOption) (*CreateAddressReply, error) {
+	var out CreateAddressReply
+	pattern := "/api/app_server/create_address"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAppCreateAddress))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in.SendBody, &out, opts...)
 	if err != nil {
@@ -944,6 +1032,19 @@ func (c *AppHTTPClientImpl) TranList(ctx context.Context, in *TranListRequest, o
 	return &out, err
 }
 
+func (c *AppHTTPClientImpl) UpdateAddress(ctx context.Context, in *UpdateAddressRequest, opts ...http.CallOption) (*UpdateAddressReply, error) {
+	var out UpdateAddressReply
+	pattern := "/api/app_server/update_address"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAppUpdateAddress))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in.SendBody, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *AppHTTPClientImpl) UserArea(ctx context.Context, in *UserAreaRequest, opts ...http.CallOption) (*UserAreaReply, error) {
 	var out UserAreaReply
 	pattern := "/api/app_server/user_area"
@@ -962,6 +1063,19 @@ func (c *AppHTTPClientImpl) UserInfo(ctx context.Context, in *UserInfoRequest, o
 	pattern := "/api/app_server/user_info"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAppUserInfo))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AppHTTPClientImpl) UserRecommend(ctx context.Context, in *RecommendListRequest, opts ...http.CallOption) (*RecommendListReply, error) {
+	var out RecommendListReply
+	pattern := "/api/app_server/recommend_list"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAppUserRecommend))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
