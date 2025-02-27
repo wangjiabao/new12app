@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api;
 
-import "validate/validate.proto";
+//import "validate/validate.proto";
 import "google/api/annotations.proto";
 
 option go_package = "/api;api";
@@ -80,7 +80,7 @@ service App {
 
 	rpc UserRecommend (RecommendListRequest) returns (RecommendListReply) {
 		option (google.api.http) = {
-			get: "/api/app_server/recommend_list"
+			get: "/api/app_server/user_recommend"
 		};
 	};
 

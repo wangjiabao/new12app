@@ -292,7 +292,7 @@ paths:
         get:
             tags:
                 - App
-            operationId: App_UserRecommend
+            operationId: App_RecommendList
             parameters:
                 - name: address
                   in: query
@@ -570,6 +570,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/UserInfoReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
+    /api/app_server/user_recommend:
+        get:
+            tags:
+                - App
+            operationId: App_UserRecommend
+            parameters:
+                - name: address
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/RecommendListReply'
                 default:
                     description: Default error response
                     content:
