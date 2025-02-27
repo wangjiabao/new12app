@@ -112,7 +112,7 @@ type UserBalance struct {
 	BalanceC            int64
 	RecommendTotalFloat float64
 	AreaTotalFloat      float64
-	AreaTwoTotalFloat   float64
+	AreaTotalFloatTwo   float64
 	LocationTotalFloat  float64
 	BalanceUsdtFloat    float64
 	BalanceRawFloat     float64
@@ -383,7 +383,6 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 		user          *User
 		recommendUser *UserRecommend
 		err           error
-		userId        int64
 		//decodeBytes   []byte
 	)
 
@@ -425,7 +424,7 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 			}
 
 			// 查询推荐人的相关信息
-			recommendUser, err = uuc.urRepo.GetUserRecommendByUserId(ctx, userId)
+			recommendUser, err = uuc.urRepo.GetUserRecommendByUserId(ctx, userRecommend.ID)
 			if nil == recommendUser || err != nil {
 				return nil, errors.New(500, "USER_ERROR", "无效的推荐码3")
 			}
@@ -1652,12 +1651,31 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	}
 
 	var (
+		userAddress []*UserAddress
 		userBalance *UserBalance
 	)
 	userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
 	if nil != err {
 		return &v1.BuyReply{
 			Status: "余额错误",
+		}, nil
+	}
+
+	userAddress, err = uuc.repo.GetUserAddress(ctx, uint64(user.ID))
+	if nil != err || 0 >= len(userAddress) {
+		return &v1.BuyReply{
+			Status: "地址错误",
+		}, nil
+	}
+
+	userAddressMap := make(map[int64]*UserAddress)
+	for _, v := range userAddress {
+		userAddressMap[v.ID] = v
+	}
+
+	if _, ok := userAddressMap[int64(req.SendBody.AddressId)]; !ok {
+		return &v1.BuyReply{
+			Status: "地址不存在",
 		}, nil
 	}
 
@@ -1791,7 +1809,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 			continue
 		}
 
-		amountUsdt := amount * 100 / 70
+		amountUsdt := amount * 70 / 100
 		if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
 			err = uuc.repo.UpdateUserNewTwoNew(ctx, v.UserId, float64(amountUsdt), amount, buyType, addressId, goodId, coinType)
 			if nil != err {
@@ -1925,7 +1943,6 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 				fmt.Println("err reward area 2", err, v)
 			}
 
-			two++
 		}
 	}
 

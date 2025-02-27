@@ -147,7 +147,7 @@ type UserBalance struct {
 	FourTotal           int64     `gorm:"type:bigint"`
 	BalanceC            int64     `gorm:"type:bigint"`
 	AreaTotalFloat      float64   `gorm:"type:decimal(65,20);not null"`
-	AreaTwoTotalFloat   float64   `gorm:"type:decimal(65,20);not null"`
+	AreaTotalFloatTwo   float64   `gorm:"type:decimal(65,20);not null"`
 	RecommendTotalFloat float64   `gorm:"type:decimal(65,20);not null"`
 	LocationTotalFloat  float64   `gorm:"type:decimal(65,20);not null"`
 	BalanceUsdtFloat    float64   `gorm:"type:decimal(65,20);not null"`
@@ -547,14 +547,14 @@ func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount
 				return errors.NotFound("user balance err", "user balance not found")
 			}
 			res2 := u.data.DB(ctx).Table("user").Where("id=?", userId).
-				Updates(map[string]interface{}{"amount_usdt": amount})
+				Updates(map[string]interface{}{"amount_usdt": amount, "amount_usdt_origin": amountOrigin})
 			if res2.Error != nil {
 				return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
 			}
 		} else {
 			buyTwo = "buy"
 			res2 := u.data.DB(ctx).Table("user").Where("id=?", userId).Where("amount>=?", amountOrigin).
-				Updates(map[string]interface{}{"amount_usdt": amount, "amount": gorm.Expr("amount - ?", amountOrigin)})
+				Updates(map[string]interface{}{"amount_usdt": amount, "amount_usdt_origin": amountOrigin, "amount": gorm.Expr("amount - ?", amountOrigin)})
 			if res2.Error != nil {
 				return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
 			}
@@ -903,7 +903,7 @@ func (u *UserRepo) CreateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 	userAddress.C = uc.C
 	userAddress.D = uc.D
 	userAddress.Phone = uc.Phone
-	res := u.data.DB(ctx).Table("user").Create(&userAddress)
+	res := u.data.DB(ctx).Table("user_address").Create(&userAddress)
 	if res.Error != nil {
 		return errors.New(500, "CREATE_USER_ERROR", "用户创建失败")
 	}
@@ -922,7 +922,7 @@ func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 	userAddress.D = uc.D
 	userAddress.Phone = uc.Phone
 	userAddress.Status = uc.Status
-	res := u.data.DB(ctx).Table("user").Updates(&userAddress)
+	res := u.data.DB(ctx).Table("user_address").Updates(&userAddress)
 	if res.Error != nil {
 		return errors.New(500, "CREATE_USER_ERROR", "用户创建失败")
 	}
@@ -959,7 +959,7 @@ func (u *UserRepo) CreateUser(ctx context.Context, uc *biz.User) (*biz.User, err
 func (u *UserRepo) GetUserAddress(ctx context.Context, userId uint64) ([]*biz.UserAddress, error) {
 	var userAddress []*UserAddress
 	res := make([]*biz.UserAddress, 0)
-	if err := u.data.db.Where("user_id", userId).Table("user").Find(&userAddress).Error; err != nil {
+	if err := u.data.db.Where("user_id", userId).Table("user_address").Find(&userAddress).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
@@ -1512,7 +1512,7 @@ func (ub UserBalanceRepo) GetUserBalance(ctx context.Context, userId int64) (*bi
 		FourTotal:           userBalance.FourTotal,
 		BalanceC:            userBalance.BalanceC,
 		AreaTotalFloat:      userBalance.AreaTotalFloat,
-		AreaTwoTotalFloat:   userBalance.AreaTwoTotalFloat,
+		AreaTotalFloatTwo:   userBalance.AreaTotalFloatTwo,
 		RecommendTotalFloat: userBalance.RecommendTotalFloat,
 		LocationTotalFloat:  userBalance.LocationTotalFloat,
 		BalanceRawFloat:     userBalance.BalanceRawFloat,

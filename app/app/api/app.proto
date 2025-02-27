@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api;
 
-//import "validate/validate.proto";
+import "validate/validate.proto";
 import "google/api/annotations.proto";
 
 option go_package = "/api;api";
