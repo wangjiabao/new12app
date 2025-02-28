@@ -356,7 +356,7 @@ type UserRepo interface {
 	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
 	UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error
 	UpdateUserMyTotalAmount(ctx context.Context, userId int64, amountUsdt float64) error
-	UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
+	UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, userAddress string, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
 	UpdateUserMyTotalAmountSub(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardAreaTwo(ctx context.Context, userId int64, amountUsdt float64, amountUsdtTotal float64, stop bool) (int64, error)
 	GetUserById(ctx context.Context, Id int64) (*User, error)
@@ -1982,7 +1982,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 					code int64
 				)
 
-				code, err = uuc.repo.UpdateUserRewardRecommend(ctx, tmpRecommendUser.ID, v.UserId, tmp, tmpUsdt, tmpNana, tmpRecommendUser.AmountUsdtOrigin, tmpTwo, stopArea2)
+				code, err = uuc.repo.UpdateUserRewardRecommend(ctx, tmpRecommendUser.ID, v.UserId, usersMap[v.UserId].Address, tmp, tmpUsdt, tmpNana, tmpRecommendUser.AmountUsdtOrigin, tmpTwo, stopArea2)
 				if code > 0 && err != nil {
 					fmt.Println("错误分红社区：", err, tmpRecommendUser)
 				}
