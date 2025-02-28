@@ -338,6 +338,7 @@ message EthAuthorizeRequest {
 
 message EthAuthorizeReply {
 	string token = 1;
+	string status = 2;
 }
 
 message RecommendUpdateRequest {

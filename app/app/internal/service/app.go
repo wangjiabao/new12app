@@ -53,7 +53,10 @@ func (a *AppService) EthAuthorize(ctx context.Context, req *v1.EthAuthorizeReque
 	userAddress := req.SendBody.Address // 以太坊账户
 	if "" == userAddress || 20 > len(userAddress) ||
 		strings.EqualFold("0x000000000000000000000000000000000000dead", userAddress) {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "账户地址参数错误")
+		return &v1.EthAuthorizeReply{
+			Token:  "",
+			Status: "账户地址参数错误",
+		}, nil
 	}
 
 	// 验证
@@ -65,7 +68,10 @@ func (a *AppService) EthAuthorize(ctx context.Context, req *v1.EthAuthorizeReque
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || userAddress != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.EthAuthorizeReply{
+			Token:  "",
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	//// 验证
@@ -97,16 +103,22 @@ func (a *AppService) EthAuthorize(ctx context.Context, req *v1.EthAuthorizeReque
 	//password := fmt.Sprintf("%x", md5.Sum([]byte(req.SendBody.Password)))
 	password := ""
 	// 根据地址查询用户，不存在时则创建
-	user, err := a.uuc.GetExistUserByAddressOrCreate(ctx, &biz.User{
+	user, err, msg := a.uuc.GetExistUserByAddressOrCreate(ctx, &biz.User{
 		Address:  userAddress,
 		Password: password,
 	}, req)
 	if err != nil {
-		return nil, err
+		return &v1.EthAuthorizeReply{
+			Token:  "",
+			Status: msg,
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.EthAuthorizeReply{
+			Token:  "",
+			Status: "用户已删除",
+		}, nil
 	}
 
 	claims := auth.CustomClaims{
@@ -121,11 +133,15 @@ func (a *AppService) EthAuthorize(ctx context.Context, req *v1.EthAuthorizeReque
 	}
 	token, err := auth.CreateToken(claims, a.ca.JwtKey)
 	if err != nil {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "生成token失败")
+		return &v1.EthAuthorizeReply{
+			Token:  token,
+			Status: "生成token失败",
+		}, nil
 	}
 
 	userInfoRsp := v1.EthAuthorizeReply{
-		Token: token,
+		Token:  token,
+		Status: "ok",
 	}
 	return &userInfoRsp, nil
 }

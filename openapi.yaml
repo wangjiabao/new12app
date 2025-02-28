@@ -753,6 +753,8 @@ components:
             properties:
                 token:
                     type: string
+                status:
+                    type: string
         EthAuthorizeRequest_SendBody:
             type: object
             properties:
