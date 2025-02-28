@@ -912,8 +912,8 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 		WithdrawMaxNa:         withdrawMaxNana,
 		WithdrawMinNa:         withdrawMinNana,
 		AmountUsdtGet:         myUser.AmountUsdtGet,
-		AmountUsdtSubGet:      myUser.AmountUsdtGet*2.1 - myUser.AmountUsdtGet,
-		AmountUsdtSubGetToday: myUser.AmountUsdtGet * 2.1 * level1,
+		AmountUsdtSubGet:      myUser.AmountUsdtGet*3 - myUser.AmountUsdtGet,
+		AmountUsdtSubGetToday: myUser.AmountUsdtGet * 3 * level1,
 		AmountUsdt:            myUser.AmountUsdt,
 		RewardThree:           myUser.MyTotalAmount,
 		AmountUsdtSubGetAll:   userBalance.LocationTotalFloat,
@@ -1971,8 +1971,8 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 				continue
 			}
 
-			if tmp+usersMap[tmpUserId].AmountUsdtGet >= tmpRecommendUser.AmountUsdt*2.1 {
-				tmp = math.Abs(tmpRecommendUser.AmountUsdt*2.1 - tmpRecommendUser.AmountUsdtGet)
+			if tmp+usersMap[tmpUserId].AmountUsdtGet >= tmpRecommendUser.AmountUsdt*3 {
+				tmp = math.Abs(tmpRecommendUser.AmountUsdt*3 - tmpRecommendUser.AmountUsdtGet)
 				stopArea2 = true
 			}
 
