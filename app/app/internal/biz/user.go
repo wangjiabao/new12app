@@ -957,6 +957,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	if nil == users || nil != err {
 		return nil, err
 	}
+
+	usersMap = make(map[int64]*User, 0)
 	for _, v := range users {
 		usersMap[v.ID] = v
 	}
