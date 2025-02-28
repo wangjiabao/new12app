@@ -1971,7 +1971,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 			}
 
 			tmpUsdt := tmp * rewardUsdtRate
-			tmpNana := tmp * exchangeNanaRate * bPrice
+			tmpNana := tmp * exchangeNanaRate / bPrice
 
 			tmp = math.Round(tmp*1000000000) / 1000000000
 			tmpUsdt = math.Round(tmpUsdt*1000000000) / 1000000000
