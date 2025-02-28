@@ -1973,9 +1973,9 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 			tmpUsdt := tmp * rewardUsdtRate
 			tmpNana := tmp * exchangeNanaRate / bPrice
 
-			tmp = math.Round(tmp*1000000000) / 1000000000
-			tmpUsdt = math.Round(tmpUsdt*1000000000) / 1000000000
-			tmpNana = math.Round(tmpNana*1000000000) / 1000000000
+			tmp = math.Round(tmp*10000000) / 10000000
+			tmpUsdt = math.Round(tmpUsdt*10000000) / 10000000
+			tmpNana = math.Round(tmpNana*10000000) / 10000000
 
 			if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
 				var (
