@@ -332,7 +332,9 @@ func (a *AppService) Exchange(ctx context.Context, req *v1.ExchangeRequest) (*v1
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.ExchangeReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -346,11 +348,15 @@ func (a *AppService) Exchange(ctx context.Context, req *v1.ExchangeRequest) (*v1
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.ExchangeReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.ExchangeReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	var (
@@ -360,7 +366,9 @@ func (a *AppService) Exchange(ctx context.Context, req *v1.ExchangeRequest) (*v1
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.ExchangeReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	//var (
@@ -388,7 +396,9 @@ func (a *AppService) CreateAddress(ctx context.Context, req *v1.CreateAddressReq
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.CreateAddressReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -407,11 +417,15 @@ func (a *AppService) CreateAddress(ctx context.Context, req *v1.CreateAddressReq
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.CreateAddressReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.CreateAddressReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	var (
@@ -421,7 +435,9 @@ func (a *AppService) CreateAddress(ctx context.Context, req *v1.CreateAddressReq
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.CreateAddressReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	return a.uuc.CreateAddress(ctx, req, user)
@@ -438,7 +454,9 @@ func (a *AppService) UpdateAddress(ctx context.Context, req *v1.UpdateAddressReq
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.UpdateAddressReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -457,11 +475,15 @@ func (a *AppService) UpdateAddress(ctx context.Context, req *v1.UpdateAddressReq
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.UpdateAddressReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.UpdateAddressReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	var (
@@ -471,7 +493,9 @@ func (a *AppService) UpdateAddress(ctx context.Context, req *v1.UpdateAddressReq
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.UpdateAddressReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	return a.uuc.UpdateAddress(ctx, req, user)
@@ -488,7 +512,9 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.BuyReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -507,11 +533,15 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.BuyReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.BuyReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	var (
@@ -521,7 +551,9 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.BuyReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	//fmt.Println(user)
@@ -565,7 +597,9 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.BuySuperReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -584,11 +618,15 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.BuySuperReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.BuySuperReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	//if 1 == user.Lock {
@@ -602,7 +640,9 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.BuySuperReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	//fmt.Println(user)
@@ -647,7 +687,9 @@ func (a *AppService) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*v1
 	if claims, ok := jwt.FromContext(ctx); ok {
 		c := claims.(jwt2.MapClaims)
 		if c["UserId"] == nil {
-			return nil, errors.New(500, "ERROR_TOKEN", "无效TOKEN")
+			return &v1.WithdrawReply{
+				Status: "无效TOKEN",
+			}, nil
 		}
 		//if c["Password"] == nil {
 		//	return nil, errors.New(403, "ERROR_TOKEN", "无效TOKEN")
@@ -661,11 +703,15 @@ func (a *AppService) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*v1
 	)
 	user, err = a.uuc.GetUserByUserId(ctx, userId)
 	if nil != err {
-		return nil, err
+		return &v1.WithdrawReply{
+			Status: "错误",
+		}, nil
 	}
 
 	if 1 == user.IsDelete {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
+		return &v1.WithdrawReply{
+			Status: "用户已删除",
+		}, nil
 	}
 
 	var (
@@ -675,7 +721,9 @@ func (a *AppService) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*v1
 
 	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
 	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+		return &v1.WithdrawReply{
+			Status: "地址签名错误",
+		}, nil
 	}
 
 	//var (
