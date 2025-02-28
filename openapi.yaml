@@ -1061,22 +1061,22 @@ components:
                 withdrawMinNa:
                     type: number
                     format: double
-                amoutUsdtGet:
+                amountUsdtGet:
                     type: number
                     format: double
-                amoutUsdtSubGet:
+                amountUsdtSubGet:
                     type: number
                     format: double
-                amoutUsdtSubGetToday:
+                amountUsdtSubGetToday:
                     type: number
                     format: double
-                amoutUsdt:
+                amountUsdt:
                     type: number
                     format: double
                 rewardThree:
                     type: number
                     format: double
-                amoutUsdtSubGetAll:
+                amountUsdtSubGetAll:
                     type: number
                     format: double
                 teamAll:

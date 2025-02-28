@@ -401,13 +401,13 @@ message UserInfoReply {
 	double withdrawMaxNa = 51; // nana最大提现金额
 	double withdrawMinNa = 54; // nana最小提现金额
 
-	double amoutUsdtGet = 8; // 已释放
-	double amoutUsdtSubGet = 9; // 待释放
-	double amoutUsdtSubGetToday = 10; // 今日待释放
-	double amoutUsdt = 31; // 认购金额
+	double amountUsdtGet = 8; // 已释放
+	double amountUsdtSubGet = 9; // 待释放
+	double amountUsdtSubGetToday = 10; // 今日待释放
+	double amountUsdt = 31; // 认购金额
 	double rewardThree = 43; // 团队业绩
 
-	double amoutUsdtSubGetAll = 41; // 静态收益
+	double amountUsdtSubGetAll = 41; // 静态收益
 	double teamAll = 42; // 团队收益
 
 	repeated ListEthRecord listEth = 117; // 充值记录
