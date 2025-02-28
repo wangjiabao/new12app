@@ -201,6 +201,13 @@ service App {
 		};
 	};
 
+	rpc BuySuper (BuySuperRequest) returns (BuySuperReply) {
+		option (google.api.http) = {
+			post: "/api/app_server/buy_super"
+			body: "send_body"
+		};
+	};
+
 	rpc CreateAddress (CreateAddressRequest) returns (CreateAddressReply) {
 		option (google.api.http) = {
 			post: "/api/app_server/create_address"
@@ -250,7 +257,6 @@ service App {
 
 message BuyRequest {
 	message SendBody{
-		uint64 amount = 1;
 		uint64 type = 2;
 		string sign = 4;
 		string publicKey = 5;
@@ -262,6 +268,19 @@ message BuyRequest {
 }
 
 message BuyReply {
+	string status = 1;
+}
+
+message BuySuperRequest {
+	message SendBody{
+		string sign = 4;
+		string publicKey = 5;
+	}
+
+	SendBody send_body = 1;
+}
+
+message BuySuperReply {
 	string status = 1;
 }
 
@@ -358,6 +377,16 @@ message UserInfoRequest {
 }
 
 message UserInfoReply {
+	string videoName = 24; // 视频
+	repeated ListGoods listGoods = 116; // 商品列表
+	message ListGoods {
+		uint64 id = 1;
+		string name = 2;
+		string detail = 3;
+		uint64 amount = 4;
+		string picName = 5;
+	}
+
 	double bPrice = 1; // nana价格
 	string address = 2; // 地址
 	string inviteUserAddress = 11; // 我的直推人地址

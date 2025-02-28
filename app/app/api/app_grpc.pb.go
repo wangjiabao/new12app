@@ -45,6 +45,7 @@ const (
 	App_AdminFee_FullMethodName            = "/api.App/AdminFee"
 	App_TokenWithdraw_FullMethodName       = "/api.App/TokenWithdraw"
 	App_Buy_FullMethodName                 = "/api.App/Buy"
+	App_BuySuper_FullMethodName            = "/api.App/BuySuper"
 	App_CreateAddress_FullMethodName       = "/api.App/CreateAddress"
 	App_UpdateAddress_FullMethodName       = "/api.App/UpdateAddress"
 )
@@ -102,6 +103,7 @@ type AppClient interface {
 	AdminFee(ctx context.Context, in *AdminFeeRequest, opts ...grpc.CallOption) (*AdminFeeReply, error)
 	TokenWithdraw(ctx context.Context, in *TokenWithdrawRequest, opts ...grpc.CallOption) (*TokenWithdrawReply, error)
 	Buy(ctx context.Context, in *BuyRequest, opts ...grpc.CallOption) (*BuyReply, error)
+	BuySuper(ctx context.Context, in *BuySuperRequest, opts ...grpc.CallOption) (*BuySuperReply, error)
 	CreateAddress(ctx context.Context, in *CreateAddressRequest, opts ...grpc.CallOption) (*CreateAddressReply, error)
 	UpdateAddress(ctx context.Context, in *UpdateAddressRequest, opts ...grpc.CallOption) (*UpdateAddressReply, error)
 }
@@ -348,6 +350,15 @@ func (c *appClient) Buy(ctx context.Context, in *BuyRequest, opts ...grpc.CallOp
 	return out, nil
 }
 
+func (c *appClient) BuySuper(ctx context.Context, in *BuySuperRequest, opts ...grpc.CallOption) (*BuySuperReply, error) {
+	out := new(BuySuperReply)
+	err := c.cc.Invoke(ctx, App_BuySuper_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *appClient) CreateAddress(ctx context.Context, in *CreateAddressRequest, opts ...grpc.CallOption) (*CreateAddressReply, error) {
 	out := new(CreateAddressReply)
 	err := c.cc.Invoke(ctx, App_CreateAddress_FullMethodName, in, out, opts...)
@@ -419,6 +430,7 @@ type AppServer interface {
 	AdminFee(context.Context, *AdminFeeRequest) (*AdminFeeReply, error)
 	TokenWithdraw(context.Context, *TokenWithdrawRequest) (*TokenWithdrawReply, error)
 	Buy(context.Context, *BuyRequest) (*BuyReply, error)
+	BuySuper(context.Context, *BuySuperRequest) (*BuySuperReply, error)
 	CreateAddress(context.Context, *CreateAddressRequest) (*CreateAddressReply, error)
 	UpdateAddress(context.Context, *UpdateAddressRequest) (*UpdateAddressReply, error)
 	mustEmbedUnimplementedAppServer()
@@ -505,6 +517,9 @@ func (UnimplementedAppServer) TokenWithdraw(context.Context, *TokenWithdrawReque
 }
 func (UnimplementedAppServer) Buy(context.Context, *BuyRequest) (*BuyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Buy not implemented")
+}
+func (UnimplementedAppServer) BuySuper(context.Context, *BuySuperRequest) (*BuySuperReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BuySuper not implemented")
 }
 func (UnimplementedAppServer) CreateAddress(context.Context, *CreateAddressRequest) (*CreateAddressReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateAddress not implemented")
@@ -993,6 +1008,24 @@ func _App_Buy_Handler(srv interface{}, ctx context.Context, dec func(interface{}
 	return interceptor(ctx, in, info, handler)
 }
 
+func _App_BuySuper_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BuySuperRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AppServer).BuySuper(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: App_BuySuper_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AppServer).BuySuper(ctx, req.(*BuySuperRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _App_CreateAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateAddressRequest)
 	if err := dec(in); err != nil {
@@ -1139,6 +1172,10 @@ var App_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Buy",
 			Handler:    _App_Buy_Handler,
+		},
+		{
+			MethodName: "BuySuper",
+			Handler:    _App_BuySuper_Handler,
 		},
 		{
 			MethodName: "CreateAddress",

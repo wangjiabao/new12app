@@ -130,6 +130,23 @@ type UserAddress struct {
 	CreatedAt time.Time
 }
 
+type Goods struct {
+	ID        int64
+	Amount    uint64
+	Name      string
+	PicName   string
+	Detail    string
+	Status    uint64
+	CreatedAt time.Time
+}
+
+type Video struct {
+	ID        int64
+	VideoName string
+	Status    uint64
+	CreatedAt time.Time
+}
+
 type Withdraw struct {
 	ID              int64
 	UserId          int64
@@ -337,6 +354,7 @@ type UserRepo interface {
 	GetEthUserRecordListByUserId(ctx context.Context, userId int64) ([]*EthUserRecord, error)
 	InRecordNew(ctx context.Context, userId int64, address string, amount int64, coinType string) error
 	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
+	UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error
 	UpdateUserMyTotalAmount(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardRecommend(ctx context.Context, userId int64, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
 	UpdateUserMyTotalAmountSub(ctx context.Context, userId int64, amountUsdt float64) error
@@ -354,6 +372,8 @@ type UserRepo interface {
 	CreateUserAddress(ctx context.Context, uc *UserAddress) error
 	UpdateUserAddress(ctx context.Context, uc *UserAddress) error
 	GetUserAddress(ctx context.Context, userId uint64) ([]*UserAddress, error)
+	GetGoods(ctx context.Context) ([]*Goods, error)
+	GetVideos(ctx context.Context) ([]*Video, error)
 }
 
 func NewUserUseCase(repo UserRepo, tx Transaction, configRepo ConfigRepo, uiRepo UserInfoRepo, urRepo UserRecommendRepo, locationRepo LocationRepo, userCurrentMonthRecommendRepo UserCurrentMonthRecommendRepo, ubRepo UserBalanceRepo, logger log.Logger) *UserUseCase {
@@ -645,6 +665,8 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 		users                 []*User
 		level1                float64
 		userAddress           []*UserAddress
+		goods                 []*Goods
+		videos                []*Video
 	)
 
 	// 配置
@@ -679,6 +701,31 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 				level1, _ = strconv.ParseFloat(vConfig.Value, 10)
 			}
 		}
+	}
+
+	goods, err = uuc.repo.GetGoods(ctx)
+	if nil != err {
+		return nil, err
+	}
+	listGoods := make([]*v1.UserInfoReply_ListGoods, 0)
+	for _, v := range goods {
+		listGoods = append(listGoods, &v1.UserInfoReply_ListGoods{
+			Id:      uint64(v.ID),
+			Name:    v.Name,
+			Detail:  v.Detail,
+			Amount:  v.Amount,
+			PicName: v.PicName,
+		})
+	}
+
+	videoName := ""
+	videos, err = uuc.repo.GetVideos(ctx)
+	if nil != err {
+		return nil, err
+	}
+	for _, v := range videos {
+		videoName = v.VideoName
+		break
 	}
 
 	users, err = uuc.repo.GetAllUsers(ctx)
@@ -849,6 +896,8 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 		})
 	}
 	return &v1.UserInfoReply{
+		VideoName:            videoName,
+		ListGoods:            listGoods,
 		BPrice:               bPrice,
 		Address:              myUser.Address,
 		InviteUserAddress:    inviteUserAddress,
@@ -1596,7 +1645,7 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 		})
 	}
 
-	return nil, nil
+	return &v1.UpdateAddressReply{Status: "ok"}, nil
 }
 
 func (uuc *UserUseCase) CreateAddress(ctx context.Context, req *v1.CreateAddressRequest, user *User) (*v1.CreateAddressReply, error) {
@@ -1623,32 +1672,36 @@ func (uuc *UserUseCase) CreateAddress(ctx context.Context, req *v1.CreateAddress
 		Status: 0,
 	})
 
-	return nil, err
+	return &v1.CreateAddressReply{Status: "ok"}, nil
 }
 
 func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User) (*v1.BuyReply, error) {
 	var (
-		amount   = req.SendBody.Amount
 		buyType  = req.SendBody.Type
 		coinType string
 		err      error
+		goods    []*Goods
+		goodsMap map[int64]*Goods
 	)
 
-	if 100 == amount {
-		amount = 100
-	} else if 200 == amount {
-		amount = 200
-	} else if 300 == amount {
-		amount = 300
-	} else if 400 == amount {
-		amount = 400
-	} else if 1000 == amount {
-		amount = 1000
-	} else {
+	goods, err = uuc.repo.GetGoods(ctx)
+	if nil != err {
 		return &v1.BuyReply{
-			Status: "金额错误",
+			Status: "余额错误",
 		}, nil
 	}
+
+	for _, v := range goods {
+		goodsMap[v.ID] = v
+	}
+
+	if _, ok := goodsMap[int64(req.SendBody.GoodId)]; !ok {
+		return &v1.BuyReply{
+			Status: "商品信息错误",
+		}, nil
+	}
+
+	amount := goodsMap[int64(req.SendBody.GoodId)].Amount
 
 	var (
 		userAddress []*UserAddress
@@ -1715,6 +1768,37 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	}
 
 	return &v1.BuyReply{
+		Status: "ok",
+	}, nil
+}
+
+func (uuc *UserUseCase) BuySuper(ctx context.Context, req *v1.BuySuperRequest, user *User) (*v1.BuySuperReply, error) {
+	var (
+		err    error
+		amount = uint64(1000)
+	)
+
+	if amount > user.Amount {
+		return &v1.BuySuperReply{
+			Status: "充值usdt余额不足",
+		}, nil
+	}
+
+	if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+		err = uuc.repo.UpdateUserNewSuper(ctx, user.ID, int64(amount))
+		if nil != err {
+			return err
+		}
+
+		return nil
+	}); nil != err {
+		fmt.Println(err, "错误投资3,super")
+		return &v1.BuySuperReply{
+			Status: "错误投资super",
+		}, err
+	}
+
+	return &v1.BuySuperReply{
 		Status: "ok",
 	}, nil
 }

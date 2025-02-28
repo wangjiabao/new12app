@@ -126,6 +126,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /api/app_server/buy_super:
+        post:
+            tags:
+                - App
+            operationId: App_BuySuper
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/BuySuperRequest_SendBody'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BuySuperReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
     /api/app_server/create_address:
         post:
             tags:
@@ -665,8 +689,6 @@ components:
         BuyRequest_SendBody:
             type: object
             properties:
-                amount:
-                    type: string
                 type:
                     type: string
                 sign:
@@ -676,6 +698,18 @@ components:
                 addressId:
                     type: string
                 goodId:
+                    type: string
+        BuySuperReply:
+            type: object
+            properties:
+                status:
+                    type: string
+        BuySuperRequest_SendBody:
+            type: object
+            properties:
+                sign:
+                    type: string
+                publicKey:
                     type: string
         CreateAddressReply:
             type: object
@@ -988,6 +1022,12 @@ components:
         UserInfoReply:
             type: object
             properties:
+                videoName:
+                    type: string
+                listGoods:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/UserInfoReply_ListGoods'
                 bPrice:
                     type: number
                     format: double
@@ -1109,6 +1149,19 @@ components:
                     type: number
                     format: double
                 createdAt:
+                    type: string
+        UserInfoReply_ListGoods:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                detail:
+                    type: string
+                amount:
+                    type: string
+                picName:
                     type: string
         UserInfoReply_ListReward:
             type: object

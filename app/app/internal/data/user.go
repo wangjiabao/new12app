@@ -74,6 +74,25 @@ type UserAddress struct {
 	UpdatedAt time.Time `gorm:"type:datetime;not null"`
 }
 
+type Goods struct {
+	ID        int64     `gorm:"primarykey;type:int"`
+	Name      string    `gorm:"type:varchar(45);not null"`
+	PicName   string    `gorm:"type:varchar(45);not null"`
+	Detail    string    `gorm:"type:varchar(45);not null"`
+	Amount    uint64    `gorm:"type:int;not null"`
+	Status    uint64    `gorm:"type:int;not null"`
+	CreatedAt time.Time `gorm:"type:datetime;not null"`
+	UpdatedAt time.Time `gorm:"type:datetime;not null"`
+}
+
+type Video struct {
+	ID        int64     `gorm:"primarykey;type:int"`
+	VideoName string    `gorm:"type:varchar(45);not null"`
+	Status    uint64    `gorm:"type:int;not null"`
+	CreatedAt time.Time `gorm:"type:datetime;not null"`
+	UpdatedAt time.Time `gorm:"type:datetime;not null"`
+}
+
 type UserRecommend struct {
 	ID            int64     `gorm:"primarykey;type:int"`
 	UserId        int64     `gorm:"type:int;not null"`
@@ -533,6 +552,43 @@ func (u *UserRepo) UpdateUserRewardAreaTwo(ctx context.Context, userId int64, am
 	return userBalanceRecode.ID, nil
 }
 
+// UpdateUserNewSuper .
+func (u *UserRepo) UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error {
+
+	res2 := u.data.DB(ctx).Table("user").Where("id=?", userId).Where("amount>=?", amount).
+		Updates(map[string]interface{}{"amount_biw": amount, "amount": gorm.Expr("amount - ?", amount)})
+	if res2.Error != nil {
+		return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
+	}
+
+	var userBalanceRecode UserBalanceRecord
+	userBalanceRecode.UserId = userId
+	userBalanceRecode.Type = "deposit_super"
+	userBalanceRecode.CoinType = "USDT"
+	userBalanceRecode.Amount = amount
+	res := u.data.DB(ctx).Table("user_balance_record").Create(&userBalanceRecode)
+	if res.Error != nil {
+		return errors.New(500, "CREATE_LOCATION_ERROR", "占位信息创建失败")
+	}
+
+	var (
+		err    error
+		reward Reward
+	)
+
+	reward.UserId = userId
+	reward.Amount = amount
+	reward.Type = "super" // 本次分红的行为类型
+	reward.TypeRecordId = userBalanceRecode.ID
+	reward.Reason = "buy_super" // 给我分红的理由
+	err = u.data.DB(ctx).Table("reward").Create(&reward).Error
+	if err != nil {
+		return errors.New(500, "CREATE_LOCATION_ERROR", "占位信息创建失败")
+	}
+
+	return nil
+}
+
 // UpdateUserNewTwoNew .
 func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error {
 	if "USDT" == coinType {
@@ -955,11 +1011,61 @@ func (u *UserRepo) CreateUser(ctx context.Context, uc *biz.User) (*biz.User, err
 	}, nil
 }
 
+// GetVideos .
+func (u *UserRepo) GetVideos(ctx context.Context) ([]*biz.Video, error) {
+	var videos []*Video
+	res := make([]*biz.Video, 0)
+	if err := u.data.db.Where("status=?", 1).Table("video").Find(&videos).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return res, errors.New(500, "USER ERROR", err.Error())
+	}
+
+	for _, v := range videos {
+		res = append(res, &biz.Video{
+			ID:        v.ID,
+			VideoName: v.VideoName,
+			Status:    v.Status,
+			CreatedAt: v.CreatedAt,
+		})
+	}
+
+	return res, nil
+}
+
+// GetGoods .
+func (u *UserRepo) GetGoods(ctx context.Context) ([]*biz.Goods, error) {
+	var goods []*Goods
+	res := make([]*biz.Goods, 0)
+	if err := u.data.db.Where("status=?", 1).Table("goods").Find(&goods).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return res, errors.New(500, "USER ERROR", err.Error())
+	}
+
+	for _, v := range goods {
+		res = append(res, &biz.Goods{
+			ID:      v.ID,
+			Amount:  v.Amount,
+			Name:    v.Name,
+			PicName: v.PicName,
+			Detail:  v.Detail,
+			Status:  v.Status,
+		})
+	}
+
+	return res, nil
+}
+
 // GetUserAddress .
 func (u *UserRepo) GetUserAddress(ctx context.Context, userId uint64) ([]*biz.UserAddress, error) {
 	var userAddress []*UserAddress
 	res := make([]*biz.UserAddress, 0)
-	if err := u.data.db.Where("user_id", userId).Table("user_address").Find(&userAddress).Error; err != nil {
+	if err := u.data.db.Where("user_id=?", userId).Table("user_address").Find(&userAddress).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
