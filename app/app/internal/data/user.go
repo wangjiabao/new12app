@@ -398,7 +398,7 @@ func (u *UserRepo) UpdateUserMyTotalAmountSub(ctx context.Context, userId int64,
 }
 
 // UpdateUserRewardRecommend .
-func (u *UserRepo) UpdateUserRewardRecommend(ctx context.Context, userId int64, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error) {
+func (u *UserRepo) UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error) {
 	var err error
 
 	if stop {
@@ -471,6 +471,7 @@ func (u *UserRepo) UpdateUserRewardRecommend(ctx context.Context, userId int64, 
 	reward.AmountNew = amountUsdt
 	reward.AmountNewTwo = amountNana
 	reward.BalanceRecordId = userBalanceRecode.ID
+	reward.ReasonLocationId = recommendUserId
 	if recommendTwo {
 		reward.Type = "system_reward_recommend_two" // 本次分红的行为类型
 		reward.Reason = "recommend_two"
