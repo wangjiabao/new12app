@@ -127,6 +127,7 @@ type UserAddress struct {
 	D         string
 	Phone     string
 	Status    uint64
+	Name      string
 	CreatedAt time.Time
 }
 
@@ -892,6 +893,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			C:         v.C,
 			D:         v.D,
 			Status:    v.Status,
+			Name:      v.Name,
 			CreatedAt: v.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 		})
 	}
@@ -1641,6 +1643,7 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 			C:      req.SendBody.C,
 			D:      req.SendBody.D,
 			Phone:  req.SendBody.Phone,
+			Name:   req.SendBody.Name,
 			Status: req.SendBody.Status,
 		})
 	}
@@ -1670,6 +1673,7 @@ func (uuc *UserUseCase) CreateAddress(ctx context.Context, req *v1.CreateAddress
 		D:      req.SendBody.D,
 		Phone:  req.SendBody.Phone,
 		Status: 0,
+		Name:   req.SendBody.Name,
 	})
 
 	return &v1.CreateAddressReply{Status: "ok"}, nil

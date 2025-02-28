@@ -64,11 +64,12 @@ type UserInfo struct {
 type UserAddress struct {
 	ID        int64     `gorm:"primarykey;type:int"`
 	UserId    int64     `gorm:"type:int;not null"`
-	A         string    `gorm:"type:varchar(45);not null"`
-	B         string    `gorm:"type:varchar(45);not null"`
-	C         string    `gorm:"type:varchar(45);not null"`
-	D         string    `gorm:"type:varchar(45);not null"`
+	A         string    `gorm:"type:varchar(200);not null"`
+	B         string    `gorm:"type:varchar(200);not null"`
+	C         string    `gorm:"type:varchar(200);not null"`
+	D         string    `gorm:"type:varchar(200);not null"`
 	Phone     string    `gorm:"type:varchar(45);not null"`
+	Name      string    `gorm:"type:varchar(45);not null"`
 	Status    uint64    `gorm:"type:int;not null"`
 	CreatedAt time.Time `gorm:"type:datetime;not null"`
 	UpdatedAt time.Time `gorm:"type:datetime;not null"`
@@ -961,6 +962,7 @@ func (u *UserRepo) CreateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 	userAddress.C = uc.C
 	userAddress.D = uc.D
 	userAddress.Phone = uc.Phone
+	userAddress.Name = uc.Name
 	res := u.data.DB(ctx).Table("user_address").Create(&userAddress)
 	if res.Error != nil {
 		return errors.New(500, "CREATE_USER_ERROR", "用户创建失败")
@@ -980,6 +982,7 @@ func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 	userAddress.D = uc.D
 	userAddress.Phone = uc.Phone
 	userAddress.Status = uc.Status
+	userAddress.Name = uc.Name
 	res := u.data.DB(ctx).Table("user_address").Updates(&userAddress)
 	if res.Error != nil {
 		return errors.New(500, "CREATE_USER_ERROR", "用户创建失败")
@@ -1086,6 +1089,7 @@ func (u *UserRepo) GetUserAddress(ctx context.Context, userId uint64) ([]*biz.Us
 			Phone:     v.Phone,
 			Status:    v.Status,
 			CreatedAt: v.CreatedAt,
+			Name:      v.Name,
 		})
 	}
 

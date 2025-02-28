@@ -292,6 +292,7 @@ message CreateAddressRequest {
 		string d = 5;
 		string phone = 6;
 		string sign = 7;
+		string name = 9;
 		string publicKey = 8;
 	}
 
@@ -312,6 +313,7 @@ message UpdateAddressRequest {
 		string phone = 6;
 		uint64 status = 7;
 		string sign = 9;
+		string name = 11;
 		string publicKey = 8;
 	}
 
@@ -423,6 +425,7 @@ message UserInfoReply {
 		string c = 3; // 区
 		string d = 6; // 详细
 		uint64 status = 7; // 状态1默认
+		string name = 8;
 		string createdAt = 4; // 时间
 	}
 
