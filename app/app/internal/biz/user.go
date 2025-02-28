@@ -1691,6 +1691,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 		}, nil
 	}
 
+	goodsMap = make(map[int64]*Goods, 0)
 	for _, v := range goods {
 		goodsMap[v.ID] = v
 	}
