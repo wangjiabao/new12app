@@ -591,9 +591,9 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已删除")
 	}
 
-	if 1 == user.Lock {
-		return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已冻结")
-	}
+	//if 1 == user.Lock {
+	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已冻结")
+	//}
 
 	var (
 		address string

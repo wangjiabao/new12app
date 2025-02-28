@@ -1781,9 +1781,27 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 
 func (uuc *UserUseCase) BuySuper(ctx context.Context, req *v1.BuySuperRequest, user *User) (*v1.BuySuperReply, error) {
 	var (
-		err    error
-		amount = uint64(1000)
+		err     error
+		configs []*Config
+		amount  = uint64(1000)
+		lockAll uint64
 	)
+
+	// 配置
+	configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "lock_all")
+	if nil != configs {
+		for _, vConfig := range configs {
+			if "lock_all" == vConfig.KeyName {
+				lockAll, _ = strconv.ParseUint(vConfig.Value, 10, 64)
+			}
+		}
+	}
+
+	if 1 == lockAll {
+		return &v1.BuySuperReply{
+			Status: "暂未开放",
+		}, nil
+	}
 
 	if amount > user.Amount {
 		return &v1.BuySuperReply{
