@@ -415,9 +415,9 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 		if "abf00dd52c08a9213f225827bc3fb100" != code {
 			//decodeBytes, err = base64.StdEncoding.DecodeString(code)
 			//code = string(decodeBytes)
-			//if 1 >= len(code) {
-			//	return nil, errors.New(500, "USER_ERROR", "无效的推荐码1")
-			//}
+			if 1 >= len(code) {
+				return nil, errors.New(500, "USER_ERROR", "无效的推荐码1"), "无效的推荐码"
+			}
 			//if userId, err = strconv.ParseInt(code[1:], 10, 64); 0 >= userId || nil != err {
 			//	return nil, errors.New(500, "USER_ERROR", "无效的推荐码2")
 			//}
