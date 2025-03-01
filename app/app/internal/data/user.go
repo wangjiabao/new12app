@@ -498,7 +498,8 @@ func (u *UserRepo) UpdateUserRewardRecommend2(ctx context.Context, userId, recom
 	if err = u.data.DB(ctx).Table("user_balance").
 		Where("user_id=?", userId).
 		Updates(map[string]interface{}{
-			"balance_usdt_float": gorm.Expr("balance_usdt_float + ?", amountUsdt),
+			"balance_usdt_float":    gorm.Expr("balance_usdt_float + ?", amountUsdt),
+			"recommend_level_float": gorm.Expr("recommend_level_float + ?", amountUsdt),
 		}).Error; nil != err {
 		return 0, errors.NotFound("user balance err", "user balance not found")
 	}
