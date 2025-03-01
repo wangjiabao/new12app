@@ -699,8 +699,6 @@ components:
                     type: string
                 goodId:
                     type: string
-                amount:
-                    type: string
         BuySuperReply:
             type: object
             properties:
