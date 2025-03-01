@@ -921,7 +921,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 		WithdrawMaxNa:         withdrawMaxNana,
 		WithdrawMinNa:         withdrawMinNana,
 		AmountUsdtGet:         fmt.Sprintf("%.4f", myUser.AmountUsdtGet),
-		AmountUsdtSubGet:      fmt.Sprintf("%.4f", myUser.AmountUsdtGet*3-myUser.AmountUsdtGet),
+		AmountUsdtSubGet:      fmt.Sprintf("%.4f", myUser.AmountUsdt*3-myUser.AmountUsdtGet),
 		AmountUsdtSubGetToday: fmt.Sprintf("%.4f", myUser.AmountUsdtGet*3*level1),
 		AmountUsdt:            fmt.Sprintf("%.4f", myUser.AmountUsdt),
 		RewardThree:           fmt.Sprintf("%.4f", myUser.MyTotalAmount),
