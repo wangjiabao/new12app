@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 	"dhb/app/app/internal/biz"
+	"fmt"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/gorm"
@@ -1024,6 +1025,7 @@ func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 	var (
 		err error
 	)
+	fmt.Println(uc)
 	if err = u.data.DB(ctx).Table("user_address").
 		Where("id=?", uc.ID).
 		Updates(map[string]interface{}{
@@ -1031,8 +1033,8 @@ func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 			"b":      uc.B,
 			"c":      uc.C,
 			"d":      uc.D,
-			"phone ": uc.Phone,
-			"name ":  uc.Name,
+			"phone":  uc.Phone,
+			"name":   uc.Name,
 			"status": uc.Status,
 		}).Error; nil != err {
 		return errors.NotFound("user balance err", "user balance not found")

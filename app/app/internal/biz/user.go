@@ -1643,6 +1643,7 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 
 	for _, v := range userAddress {
 		if 1 == req.SendBody.Status && 1 == v.Status {
+			fmt.Println(1)
 			err = uuc.repo.UpdateUserAddress(ctx, &UserAddress{
 				ID:     v.ID,
 				UserId: v.UserId,
@@ -1656,11 +1657,11 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 			})
 		}
 
-		fmt.Println(v, req.SendBody)
 		if uint64(v.ID) != req.SendBody.Id {
 			continue
 		}
 
+		fmt.Println(2)
 		err = uuc.repo.UpdateUserAddress(ctx, &UserAddress{
 			ID:     v.ID,
 			UserId: v.UserId,
