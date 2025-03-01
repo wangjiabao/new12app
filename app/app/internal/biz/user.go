@@ -1662,7 +1662,6 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 
 	for _, v := range userAddress {
 		if 1 == req.SendBody.Status && 1 == v.Status {
-			fmt.Println(1)
 			err = uuc.repo.UpdateUserAddress(ctx, &UserAddress{
 				ID:     v.ID,
 				UserId: v.UserId,
@@ -1680,7 +1679,6 @@ func (uuc *UserUseCase) UpdateAddress(ctx context.Context, req *v1.UpdateAddress
 			continue
 		}
 
-		fmt.Println(2)
 		err = uuc.repo.UpdateUserAddress(ctx, &UserAddress{
 			ID:     v.ID,
 			UserId: v.UserId,
@@ -2191,8 +2189,7 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 		return nil, err
 	}
 
-	amountUint, _ := strconv.ParseUint(req.SendBody.Amount, 10, 64)
-	amountFloat := float64(amountUint)
+	amountFloat := float64(req.SendBody.Amount)
 
 	// 配置
 	var (

@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"dhb/app/app/internal/biz"
-	"fmt"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"gorm.io/gorm"
@@ -1021,11 +1020,9 @@ func (u *UserRepo) CreateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 
 // UpdateUserAddress .
 func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) error {
-
 	var (
 		err error
 	)
-	fmt.Println(uc)
 	if err = u.data.DB(ctx).Table("user_address").
 		Where("id=?", uc.ID).
 		Updates(map[string]interface{}{
