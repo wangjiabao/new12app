@@ -395,25 +395,25 @@ message UserInfoReply {
 	string inviteUserAddress = 11; // 我的直推人地址
 	string addressTwo = 6; // 充值地址
 	uint64 amount = 4; // 充值usdt余额
-	double balanceNana = 3; // nana余额
-	double balanceUsdt = 5; // usdt余额
+	string balanceNana = 3; // nana余额
+	string balanceUsdt = 5; // usdt余额
 	double withdrawMax = 52; // 最大提现金额
 	double withdrawMin = 53; // 最小提现金额
 	double withdrawMaxNa = 51; // nana最大提现金额
 	double withdrawMinNa = 54; // nana最小提现金额
 
-	double amountUsdtGet = 8; // 已释放
-	double amountUsdtSubGet = 9; // 待释放
-	double amountUsdtSubGetToday = 10; // 今日待释放
-	double amountUsdt = 31; // 认购金额
-	double rewardThree = 43; // 团队业绩
+	string amountUsdtGet = 8; // 已释放
+	string amountUsdtSubGet = 9; // 待释放
+	string amountUsdtSubGetToday = 10; // 今日待释放
+	string amountUsdt = 31; // 认购金额
+	string rewardThree = 43; // 团队业绩
 
-	double amountUsdtSubGetAll = 41; // 静态收益
-	double teamAll = 42; // 团队收益
+	string amountUsdtSubGetAll = 41; // 静态收益
+	string teamAll = 42; // 团队收益
 
 	repeated ListEthRecord listEth = 117; // 充值记录
 	message ListEthRecord {
-		double amount = 1; // 金额
+		string amount = 1; // 金额
 		string createdAt = 2; // 时间
 	}
 
@@ -432,7 +432,7 @@ message UserInfoReply {
 
 	repeated ListBuy listBuy = 118; // 认购记录
 	message ListBuy {
-		double amount = 1; // 金额
+		string amount = 1; // 金额
 		string createdAt = 2; // 时间
 		uint64 goodId = 3; // 商品id
 		uint64 addressId = 6; // 地址信息id
@@ -441,15 +441,15 @@ message UserInfoReply {
 
 	repeated ListExchange listExchange = 120; // rsdt兑换nana记录
 	message ListExchange {
-		double amountUsdt = 1; // usdt金额
-		double amountNa = 2; // nana金额
+		string amountUsdt = 1; // usdt金额
+		string amountNa = 2; // nana金额
 		string createdAt = 3; // 时间
 	}
 
 	repeated ListReward listReward = 121; // 收益记录
 	message ListReward {
-		double amountUsdt = 1; // usdt金额
-		double amountNa = 4; // nana金额
+		string amountUsdt = 1; // usdt金额
+		string amountNa = 4; // nana金额
 		uint64 rewardType = 2; // 收益类型:1节点，2推荐,3推荐2代,4团队,5平级,6提现,7提现nana,8报单
 		string createdAt = 3; // 时间
 	}
@@ -553,11 +553,11 @@ message RecommendListRequest {
 message RecommendListReply {
 	uint64 myLevel = 1; // 等级
 	uint64 totalMyAmount = 3; // 个人业绩
-	double totalAmount = 4; // 团队总业绩
+	string totalAmount = 4; // 团队总业绩
 	repeated List recommends = 2;
 	message List {
 		string address = 1;
-		double amount = 2; // 团队业绩
+		string amount = 2; // 团队业绩
 		uint64 myLevel = 4; // 等级
 		string created_at = 3;
 	}

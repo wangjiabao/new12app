@@ -790,71 +790,71 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			if "location" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 1,
 				})
 			} else if "recommend" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 2,
 				})
 			} else if "recommend_two" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 3,
 				})
 			} else if "area" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 4,
 				})
 			} else if "area_three" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 5,
 				})
 			} else if "withdraw" == vUserReward.Reason {
 				if "USDT" == vUserReward.Type {
 					listReward = append(listReward, &v1.UserInfoReply_ListReward{
 						CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-						AmountNa:   vUserReward.AmountNewTwo,
-						AmountUsdt: vUserReward.AmountNew,
+						AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+						AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 						RewardType: 6,
 					})
 				} else {
 					listReward = append(listReward, &v1.UserInfoReply_ListReward{
 						CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-						AmountNa:   vUserReward.AmountNewTwo,
-						AmountUsdt: vUserReward.AmountNew,
+						AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+						AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 						RewardType: 7,
 					})
 				}
 			} else if "all" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 8,
 				})
 			} else if "recommend_level" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-					AmountNa:   vUserReward.AmountNewTwo,
-					AmountUsdt: vUserReward.AmountNew,
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 9,
 				})
 			} else if "buy" == vUserReward.Reason {
 				listBuy = append(listBuy, &v1.UserInfoReply_ListBuy{
-					Amount:    0,
+					Amount:    fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					CreatedAt: vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 					GoodId:    uint64(vUserReward.AmountB),
 					AddressId: uint64(vUserReward.Amount),
@@ -862,8 +862,8 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 				})
 			} else if "exchange" == vUserReward.Reason {
 				listExchange = append(listExchange, &v1.UserInfoReply_ListExchange{
-					AmountUsdt: vUserReward.AmountNewTwo,
-					AmountNa:   vUserReward.AmountNew,
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 				})
 			} else {
@@ -883,7 +883,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 	listUserEth := make([]*v1.UserInfoReply_ListEthRecord, 0)
 	for _, vUserEth := range userEth {
 		listUserEth = append(listUserEth, &v1.UserInfoReply_ListEthRecord{
-			Amount:    float64(vUserEth.AmountTwo),
+			Amount:    fmt.Sprintf("%.4f", float64(vUserEth.AmountTwo)),
 			CreatedAt: vUserEth.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 		})
 	}
@@ -914,19 +914,19 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 		InviteUserAddress:     inviteUserAddress,
 		AddressTwo:            myUser.AddressTwo,
 		Amount:                myUser.Amount,
-		BalanceNana:           userBalance.BalanceRawFloat,
-		BalanceUsdt:           userBalance.BalanceUsdtFloat,
+		BalanceNana:           fmt.Sprintf("%.4f", userBalance.BalanceRawFloat),
+		BalanceUsdt:           fmt.Sprintf("%.4f", userBalance.BalanceUsdtFloat),
 		WithdrawMax:           withdrawMax,
 		WithdrawMin:           withdrawMin,
 		WithdrawMaxNa:         withdrawMaxNana,
 		WithdrawMinNa:         withdrawMinNana,
-		AmountUsdtGet:         myUser.AmountUsdtGet,
-		AmountUsdtSubGet:      myUser.AmountUsdtGet*3 - myUser.AmountUsdtGet,
-		AmountUsdtSubGetToday: myUser.AmountUsdtGet * 3 * level1,
-		AmountUsdt:            myUser.AmountUsdt,
-		RewardThree:           myUser.MyTotalAmount,
-		AmountUsdtSubGetAll:   userBalance.LocationTotalFloat,
-		TeamAll:               userBalance.AreaTotalFloat,
+		AmountUsdtGet:         fmt.Sprintf("%.4f", myUser.AmountUsdtGet),
+		AmountUsdtSubGet:      fmt.Sprintf("%.4f", myUser.AmountUsdtGet*3-myUser.AmountUsdtGet),
+		AmountUsdtSubGetToday: fmt.Sprintf("%.4f", myUser.AmountUsdtGet*3*level1),
+		AmountUsdt:            fmt.Sprintf("%.4f", myUser.AmountUsdt),
+		RewardThree:           fmt.Sprintf("%.4f", myUser.MyTotalAmount),
+		AmountUsdtSubGetAll:   fmt.Sprintf("%.4f", userBalance.LocationTotalFloat),
+		TeamAll:               fmt.Sprintf("%.4f", userBalance.AreaTotalFloat),
 		ListEth:               listUserEth,
 		ListAddress:           listUserAddress,
 		ListBuy:               listBuy,
@@ -1074,7 +1074,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 
 		res = append(res, &v1.RecommendListReply_List{
 			Address:   usersMap[vMyUserRecommend.UserId].Address,
-			Amount:    usersMap[vMyUserRecommend.UserId].MyTotalAmount,
+			Amount:    fmt.Sprintf("%.4f", usersMap[vMyUserRecommend.UserId].MyTotalAmount),
 			MyLevel:   tmpCurrentLevel,
 			CreatedAt: vMyUserRecommend.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 		})
@@ -1102,7 +1102,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	return &v1.RecommendListReply{
 		TotalMyAmount: totalMyAmount,
 		MyLevel:       currentLevel,
-		TotalAmount:   user.MyTotalAmount,
+		TotalAmount:   fmt.Sprintf("%.4f", user.MyTotalAmount),
 		Recommends:    res,
 	}, nil
 }

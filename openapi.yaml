@@ -836,8 +836,7 @@ components:
                 totalMyAmount:
                     type: string
                 totalAmount:
-                    type: number
-                    format: double
+                    type: string
                 recommends:
                     type: array
                     items:
@@ -848,8 +847,7 @@ components:
                 address:
                     type: string
                 amount:
-                    type: number
-                    format: double
+                    type: string
                 myLevel:
                     type: string
                 createdAt:
@@ -1046,11 +1044,9 @@ components:
                 amount:
                     type: string
                 balanceNana:
-                    type: number
-                    format: double
+                    type: string
                 balanceUsdt:
-                    type: number
-                    format: double
+                    type: string
                 withdrawMax:
                     type: number
                     format: double
@@ -1064,26 +1060,19 @@ components:
                     type: number
                     format: double
                 amountUsdtGet:
-                    type: number
-                    format: double
+                    type: string
                 amountUsdtSubGet:
-                    type: number
-                    format: double
+                    type: string
                 amountUsdtSubGetToday:
-                    type: number
-                    format: double
+                    type: string
                 amountUsdt:
-                    type: number
-                    format: double
+                    type: string
                 rewardThree:
-                    type: number
-                    format: double
+                    type: string
                 amountUsdtSubGetAll:
-                    type: number
-                    format: double
+                    type: string
                 teamAll:
-                    type: number
-                    format: double
+                    type: string
                 listEth:
                     type: array
                     items:
@@ -1129,8 +1118,7 @@ components:
             type: object
             properties:
                 amount:
-                    type: number
-                    format: double
+                    type: string
                 createdAt:
                     type: string
                 goodId:
@@ -1143,19 +1131,16 @@ components:
             type: object
             properties:
                 amount:
-                    type: number
-                    format: double
+                    type: string
                 createdAt:
                     type: string
         UserInfoReply_ListExchange:
             type: object
             properties:
                 amountUsdt:
-                    type: number
-                    format: double
+                    type: string
                 amountNa:
-                    type: number
-                    format: double
+                    type: string
                 createdAt:
                     type: string
         UserInfoReply_ListGoods:
@@ -1175,11 +1160,9 @@ components:
             type: object
             properties:
                 amountUsdt:
-                    type: number
-                    format: double
+                    type: string
                 amountNa:
-                    type: number
-                    format: double
+                    type: string
                 rewardType:
                     type: string
                 createdAt:
