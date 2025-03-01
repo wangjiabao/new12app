@@ -845,6 +845,13 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 					AmountUsdt: vUserReward.AmountNew,
 					RewardType: 8,
 				})
+			} else if "recommend_level" == vUserReward.Reason {
+				listReward = append(listReward, &v1.UserInfoReply_ListReward{
+					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
+					AmountNa:   vUserReward.AmountNewTwo,
+					AmountUsdt: vUserReward.AmountNew,
+					RewardType: 9,
+				})
 			} else if "buy" == vUserReward.Reason {
 				listBuy = append(listBuy, &v1.UserInfoReply_ListBuy{
 					Amount:    0,
