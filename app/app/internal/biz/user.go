@@ -273,6 +273,7 @@ type UserBalanceRepo interface {
 	GetUserBalance(ctx context.Context, userId int64) (*UserBalance, error)
 	GetRewardFourYes(ctx context.Context) (*Reward, error)
 	GetUserRewardByUserId(ctx context.Context, userId int64) ([]*Reward, error)
+	GetUserRewardBuyByUserId(ctx context.Context, userId int64) ([]*Reward, error)
 	GetLocationsToday(ctx context.Context) ([]*LocationNew, error)
 	GetUserRewardByUserIds(ctx context.Context, userIds ...int64) (map[int64]*UserSortRecommendReward, error)
 	GetUserRewards(ctx context.Context, b *Pagination, userId int64) ([]*Reward, error, int64)
@@ -1032,15 +1033,22 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 	}
 
-	var totalMyAmount uint64
+	var totalMyAmount float64
+	var (
+		userRewards []*Reward
+	)
+
+	userRewards, err = uuc.ubRepo.GetUserRewardBuyByUserId(ctx, user.ID)
+	for _, vUserReward := range userRewards {
+		totalMyAmount += vUserReward.AmountNew
+	}
+
 	tmpAreaMin := float64(0)
 	res := make([]*v1.RecommendListReply_List, 0)
 	for _, vMyUserRecommend := range myUserRecommend {
 		if _, ok := usersMap[vMyUserRecommend.UserId]; !ok {
 			continue
 		}
-
-		totalMyAmount += uint64(usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin)
 
 		if tmpMaxId != vMyUserRecommend.UserId {
 			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount
@@ -1111,7 +1119,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	}
 
 	return &v1.RecommendListReply{
-		TotalMyAmount: totalMyAmount,
+		TotalMyAmount: uint64(totalMyAmount),
 		MyLevel:       currentLevel,
 		TotalAmount:   fmt.Sprintf("%.4f", user.MyTotalAmount),
 		Recommends:    res,
@@ -1699,7 +1707,7 @@ func (uuc *UserUseCase) CreateAddress(ctx context.Context, req *v1.CreateAddress
 		return nil, err
 	}
 
-	if 20 <= len(userAddress) {
+	if 200 <= len(userAddress) {
 		return nil, nil
 	}
 

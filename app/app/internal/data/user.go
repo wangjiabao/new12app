@@ -3141,6 +3141,39 @@ func (uc *UserCurrentMonthRecommendRepo) GetUserCurrentMonthRecommendGroupByUser
 	return res, nil, count
 }
 
+// GetUserRewardBuyByUserId .
+func (ub *UserBalanceRepo) GetUserRewardBuyByUserId(ctx context.Context, userId int64) ([]*biz.Reward, error) {
+	var rewards []*Reward
+	res := make([]*biz.Reward, 0)
+	if err := ub.data.db.Where("user_id", userId).Table("reward").Where("reason=?", "buy").Find(&rewards).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return res, errors.NotFound("REWARD_NOT_FOUND", "reward not found")
+		}
+
+		return nil, errors.New(500, "REWARD ERROR", err.Error())
+	}
+
+	for _, reward := range rewards {
+		res = append(res, &biz.Reward{
+			ID:               reward.ID,
+			UserId:           reward.UserId,
+			Amount:           reward.Amount,
+			BalanceRecordId:  reward.BalanceRecordId,
+			Type:             reward.Type,
+			TypeRecordId:     reward.TypeRecordId,
+			Reason:           reward.Reason,
+			ReasonLocationId: reward.ReasonLocationId,
+			LocationType:     reward.LocationType,
+			CreatedAt:        reward.CreatedAt,
+			AmountB:          reward.AmountB,
+			AmountNew:        reward.AmountNew,
+			AmountNewTwo:     reward.AmountNewTwo,
+			Status:           uint64(reward.Status),
+		})
+	}
+	return res, nil
+}
+
 // GetUserRewardByUserId .
 func (ub *UserBalanceRepo) GetUserRewardByUserId(ctx context.Context, userId int64) ([]*biz.Reward, error) {
 	var rewards []*Reward
