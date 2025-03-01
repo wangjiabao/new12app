@@ -1029,7 +1029,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 			continue
 		}
 
-		totalMyAmount += usersMap[vMyUserRecommend.UserId].Amount
+		totalMyAmount += uint64(usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin)
 
 		if tmpMaxId != vMyUserRecommend.UserId {
 			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount
