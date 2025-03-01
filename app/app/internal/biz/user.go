@@ -33,6 +33,7 @@ type User struct {
 	Total                  uint64
 	IsDelete               int64
 	Out                    int64
+	RecommendLevel         int64
 	CreatedAt              time.Time
 	Lock                   int64
 	AmountUsdt             float64
@@ -358,6 +359,7 @@ type UserRepo interface {
 	UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error
 	UpdateUserMyTotalAmount(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, userAddress string, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
+	UpdateUserRewardRecommend2(ctx context.Context, userId, recommendUserId int64, userAddress string, amountUsdt float64) (int64, error)
 	UpdateUserMyTotalAmountSub(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardAreaTwo(ctx context.Context, userId int64, amountUsdt float64, amountUsdtTotal float64, stop bool) (int64, error)
 	GetUserById(ctx context.Context, Id int64) (*User, error)
@@ -1834,6 +1836,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 		err              error
 		configs          []*Config
 		recommend        float64
+		recommendLevel   float64
 		recommendTwo     float64
 		bPrice           float64
 		rewardUsdtRate   float64
@@ -1841,13 +1844,15 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 	)
 
 	// 配置
-	configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "b_price", "recommend", "recommend_two", "reward_usdt_rate", "exchange_nana_rate")
+	configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "b_price", "recommend", "recommend_level", "recommend_two", "reward_usdt_rate", "exchange_nana_rate")
 	if nil != configs {
 		for _, vConfig := range configs {
 			if "recommend_two" == vConfig.KeyName {
 				recommendTwo, _ = strconv.ParseFloat(vConfig.Value, 10)
 			} else if "recommend" == vConfig.KeyName {
 				recommend, _ = strconv.ParseFloat(vConfig.Value, 10)
+			} else if "recommend_level" == vConfig.KeyName {
+				recommendLevel, _ = strconv.ParseFloat(vConfig.Value, 10)
 			} else if "b_price" == vConfig.KeyName {
 				bPrice, _ = strconv.ParseFloat(vConfig.Value, 10)
 			} else if "reward_usdt_rate" == vConfig.KeyName {
@@ -1960,7 +1965,18 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 				// 增加业绩
 				err = uuc.repo.UpdateUserMyTotalAmount(ctx, tmpUserId, float64(amount))
 				if err != nil {
-					fmt.Println("错误分红静态：", err, v)
+					fmt.Println("错误修改业绩认购：", err, v)
+				}
+
+				if 0 < usersMap[tmpUserId].RecommendLevel {
+					var (
+						code int64
+					)
+
+					code, err = uuc.repo.UpdateUserRewardRecommend2(ctx, tmpUserId, v.UserId, usersMap[v.UserId].Address, float64(amountUsdt)*recommendLevel)
+					if code > 0 && err != nil {
+						fmt.Println("错误分红特殊：", err)
+					}
 				}
 
 				return nil
@@ -1970,7 +1986,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 			}
 
 			two++
-			tmp := float64(amount)
+			tmp := float64(amountUsdt)
 			tmpTwo := false
 			if 1 == two {
 				tmp = tmp * recommend
@@ -2051,7 +2067,6 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 			}); nil != err {
 				fmt.Println("err reward area 2", err, v)
 			}
-
 		}
 	}
 
