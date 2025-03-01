@@ -845,12 +845,19 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 8,
 				})
-			} else if "recommend_level" == vUserReward.Reason {
+			} else if "buy_super" == vUserReward.Reason {
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
 					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
 					RewardType: 9,
+				})
+			} else if "recommend_level" == vUserReward.Reason {
+				listReward = append(listReward, &v1.UserInfoReply_ListReward{
+					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
+					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
+					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
+					RewardType: 10,
 				})
 			} else if "buy" == vUserReward.Reason {
 				listBuy = append(listBuy, &v1.UserInfoReply_ListBuy{
