@@ -901,6 +901,10 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 	}
 	listUserAddress := make([]*v1.UserInfoReply_ListAddress, 0)
 	for _, v := range userAddress {
+		if 2 <= v.Status {
+			continue
+		}
+
 		listUserAddress = append(listUserAddress, &v1.UserInfoReply_ListAddress{
 			Id:        uint64(v.ID),
 			Phone:     v.Phone,
