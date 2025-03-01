@@ -1027,8 +1027,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	tmpAreaMax := float64(0)
 	tmpMaxId := int64(0)
 	for _, vMyUserRecommend := range myUserRecommend {
-		if tmpAreaMax < usersMap[vMyUserRecommend.UserId].MyTotalAmount {
-			tmpAreaMax = usersMap[vMyUserRecommend.UserId].MyTotalAmount
+		if tmpAreaMax < usersMap[vMyUserRecommend.UserId].MyTotalAmount+usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin {
+			tmpAreaMax = usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin
 			tmpMaxId = vMyUserRecommend.UserId
 		}
 	}
@@ -1051,7 +1051,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 
 		if tmpMaxId != vMyUserRecommend.UserId {
-			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount
+			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin
 		}
 
 		tmpCurrentLevel := uint64(0)
@@ -1060,8 +1060,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 				tmpTmpAreaMax := float64(0)
 				tmpTmpMaxId := int64(0)
 				for _, v := range myLowUser[vMyUserRecommend.UserId] {
-					if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount {
-						tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount
+					if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount+usersMap[v.UserId].AmountUsdtOrigin {
+						tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdtOrigin
 						tmpTmpMaxId = v.UserId
 					}
 				}
@@ -1069,7 +1069,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 				tmpTmpAreaMin := float64(0)
 				for _, v := range myLowUser[vMyUserRecommend.UserId] {
 					if tmpTmpMaxId != v.UserId {
-						tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount
+						tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdtOrigin
 					}
 				}
 
