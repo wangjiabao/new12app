@@ -849,7 +849,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 				listReward = append(listReward, &v1.UserInfoReply_ListReward{
 					CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 					AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
-					AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
+					AmountUsdt: fmt.Sprintf("%.4f", float64(vUserReward.Amount)),
 					RewardType: 9,
 				})
 			} else if "recommend_level" == vUserReward.Reason {
