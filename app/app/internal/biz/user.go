@@ -2191,7 +2191,8 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 		return nil, err
 	}
 
-	amountFloat, _ := strconv.ParseFloat(req.SendBody.Amount, 10)
+	amountUint, _ := strconv.ParseUint(req.SendBody.Amount, 10, 64)
+	amountFloat := float64(amountUint)
 
 	// 配置
 	var (
@@ -2211,7 +2212,7 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 				withdrawMax, _ = strconv.ParseFloat(vConfig.Value, 10)
 			}
 
-			if "withdraw_amount_max" == vConfig.KeyName {
+			if "withdraw_amount_min" == vConfig.KeyName {
 				withdrawMin, _ = strconv.ParseFloat(vConfig.Value, 10)
 			}
 
