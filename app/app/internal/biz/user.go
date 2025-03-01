@@ -1702,14 +1702,28 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 		goodsMap[v.ID] = v
 	}
 
-	if req.SendBody
-	if _, ok := goodsMap[int64(req.SendBody.GoodId)]; !ok {
-		return &v1.BuyReply{
-			Status: "商品信息错误",
-		}, nil
-	}
+	// todo
+	var (
+		goodId    uint64
+		amount    uint64
+		addressId uint64
+	)
+	if 100 == req.SendBody.Amount {
+		amount = 100
+		goodId = 1
+	} else if 300 == req.SendBody.Amount {
+		amount = 300
+		goodId = 2
+	} else {
+		if _, ok := goodsMap[int64(req.SendBody.GoodId)]; !ok {
+			return &v1.BuyReply{
+				Status: "商品信息错误",
+			}, nil
+		}
 
-	amount := goodsMap[int64(req.SendBody.GoodId)].Amount
+		amount = goodsMap[int64(req.SendBody.GoodId)].Amount
+		goodId = req.SendBody.GoodId
+	}
 
 	var (
 		userAddress []*UserAddress
@@ -1722,22 +1736,25 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 		}, nil
 	}
 
-	userAddress, err = uuc.repo.GetUserAddress(ctx, uint64(user.ID))
-	if nil != err || 0 >= len(userAddress) {
-		return &v1.BuyReply{
-			Status: "地址错误",
-		}, nil
-	}
+	// todo
+	if 0 < req.SendBody.AddressId {
+		userAddress, err = uuc.repo.GetUserAddress(ctx, uint64(user.ID))
+		if nil != err || 0 >= len(userAddress) {
+			return &v1.BuyReply{
+				Status: "地址错误",
+			}, nil
+		}
 
-	userAddressMap := make(map[int64]*UserAddress)
-	for _, v := range userAddress {
-		userAddressMap[v.ID] = v
-	}
+		userAddressMap := make(map[int64]*UserAddress)
+		for _, v := range userAddress {
+			userAddressMap[v.ID] = v
+		}
 
-	if _, ok := userAddressMap[int64(req.SendBody.AddressId)]; !ok {
-		return &v1.BuyReply{
-			Status: "地址不存在",
-		}, nil
+		if _, ok := userAddressMap[int64(req.SendBody.AddressId)]; !ok {
+			return &v1.BuyReply{
+				Status: "地址不存在",
+			}, nil
+		}
 	}
 
 	if 2 == buyType {
@@ -1767,7 +1784,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	var (
 		res bool
 	)
-	res, err = uuc.EthUserRecordHandle(ctx, amount, buyType, coinType, req.SendBody.AddressId, req.SendBody.GoodId, notExistDepositResult...)
+	res, err = uuc.EthUserRecordHandle(ctx, amount, buyType, coinType, addressId, goodId, notExistDepositResult...)
 	if !res || nil != err {
 		fmt.Println(err)
 		return &v1.BuyReply{
