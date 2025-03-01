@@ -827,15 +827,15 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 				if "USDT" == vUserReward.Type {
 					listReward = append(listReward, &v1.UserInfoReply_ListReward{
 						CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
-						AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
-						AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
+						AmountNa:   "0",
+						AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
 						RewardType: 6,
 					})
 				} else {
 					listReward = append(listReward, &v1.UserInfoReply_ListReward{
 						CreatedAt:  vUserReward.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 						AmountNa:   fmt.Sprintf("%.4f", vUserReward.AmountNewTwo),
-						AmountUsdt: fmt.Sprintf("%.4f", vUserReward.AmountNew),
+						AmountUsdt: "0",
 						RewardType: 7,
 					})
 				}
