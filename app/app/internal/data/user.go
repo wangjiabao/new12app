@@ -1025,7 +1025,7 @@ func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 		err error
 	)
 	if err = u.data.DB(ctx).Table("user_address").
-		Where("user_id=?", uc.UserId).
+		Where("id=?", uc.ID).
 		Updates(map[string]interface{}{
 			"a":      uc.A,
 			"b":      uc.B,
