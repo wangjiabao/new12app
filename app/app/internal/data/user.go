@@ -1020,21 +1020,23 @@ func (u *UserRepo) CreateUserAddress(ctx context.Context, uc *biz.UserAddress) e
 
 // UpdateUserAddress .
 func (u *UserRepo) UpdateUserAddress(ctx context.Context, uc *biz.UserAddress) error {
-	var userAddress UserAddress
 
-	userAddress.UserId = uc.UserId
-	userAddress.A = uc.A
-	userAddress.B = uc.B
-	userAddress.C = uc.C
-	userAddress.D = uc.D
-	userAddress.Phone = uc.Phone
-	userAddress.Status = uc.Status
-	userAddress.Name = uc.Name
-	res := u.data.DB(ctx).Table("user_address").Updates(&userAddress)
-	if res.Error != nil {
-		return errors.New(500, "CREATE_USER_ERROR", "用户创建失败")
+	var (
+		err error
+	)
+	if err = u.data.DB(ctx).Table("user_address").
+		Where("user_id=?", uc.UserId).
+		Updates(map[string]interface{}{
+			"a":      uc.A,
+			"b":      uc.B,
+			"c":      uc.C,
+			"d":      uc.D,
+			"phone ": uc.Phone,
+			"name ":  uc.Name,
+			"status": uc.Status,
+		}).Error; nil != err {
+		return errors.NotFound("user balance err", "user balance not found")
 	}
-
 	return nil
 }
 
