@@ -1702,6 +1702,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 		goodsMap[v.ID] = v
 	}
 
+	if req.SendBody
 	if _, ok := goodsMap[int64(req.SendBody.GoodId)]; !ok {
 		return &v1.BuyReply{
 			Status: "商品信息错误",

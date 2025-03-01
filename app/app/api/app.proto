@@ -262,6 +262,7 @@ message BuyRequest {
 		string publicKey = 5;
 		uint64 addressId = 6;
 		uint64 goodId = 7;
+		uint64 amount = 8;
 	}
 
 	SendBody send_body = 1;
