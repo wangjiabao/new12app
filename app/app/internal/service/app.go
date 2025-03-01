@@ -879,7 +879,7 @@ func (a *AppService) Trade(ctx context.Context, req *v1.WithdrawRequest) (*v1.Wi
 	// TODO 验证签名
 	password := fmt.Sprintf("%x", md5.Sum([]byte(req.SendBody.Password)))
 
-	amountFloat, _ := strconv.ParseFloat(req.SendBody.Amount, 10)
+	amountFloat, _ := strconv.ParseFloat("", 10)
 	amountFloatCsd = amountFloat * 10000000000
 	amount, _ := strconv.ParseInt(strconv.FormatFloat(amountFloatCsd, 'f', -1, 64), 10, 64)
 	if 10000000000 > amount {
@@ -892,7 +892,7 @@ func (a *AppService) Trade(ctx context.Context, req *v1.WithdrawRequest) (*v1.Wi
 	//	return nil, errors.New(500, "ERROR_TOKEN", "10的整数倍")
 	//}
 
-	csd, err = GetAmountOut(req.SendBody.Amount + "000000000000000000")
+	csd, err = GetAmountOut("" + "000000000000000000")
 	if nil != err {
 		return nil, errors.New(500, "ERROR_TOKEN", "查询币价错误")
 	}
