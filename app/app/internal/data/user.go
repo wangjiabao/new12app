@@ -308,11 +308,12 @@ func (u *UserRepo) GetUserByAddress(ctx context.Context, address string) (*biz.U
 	}
 
 	return &biz.User{
-		ID:         user.ID,
-		Address:    user.Address,
-		Password:   user.Password,
-		IsDelete:   user.IsDelete,
-		AmountUsdt: user.AmountUsdt,
+		ID:            user.ID,
+		Address:       user.Address,
+		Password:      user.Password,
+		IsDelete:      user.IsDelete,
+		AmountUsdt:    user.AmountUsdt,
+		MyTotalAmount: user.MyTotalAmount,
 	}, nil
 }
 
