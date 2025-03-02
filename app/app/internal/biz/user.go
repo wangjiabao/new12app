@@ -2032,6 +2032,11 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 				return false, err
 			}
 
+			// 已经出局的
+			if 0 >= usersMap[tmpUserId].AmountUsdt {
+				continue
+			}
+
 			two++
 			tmp := float64(amountUsdt)
 			tmpTwo := false
