@@ -1037,15 +1037,15 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 	}
 
-	var totalMyAmount float64
-	var (
-		userRewards []*Reward
-	)
-
-	userRewards, err = uuc.ubRepo.GetUserRewardBuyByUserId(ctx, user.ID)
-	for _, vUserReward := range userRewards {
-		totalMyAmount += vUserReward.AmountNew
-	}
+	//var totalMyAmount float64
+	//var (
+	//	userRewards []*Reward
+	//)
+	//
+	//userRewards, err = uuc.ubRepo.GetUserRewardBuyByUserId(ctx, user.ID)
+	//for _, vUserReward := range userRewards {
+	//	totalMyAmount += vUserReward.AmountNew
+	//}
 
 	tmpAreaMin := float64(0)
 	res := make([]*v1.RecommendListReply_List, 0)
@@ -1059,41 +1059,41 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 
 		tmpCurrentLevel := uint64(0)
-		if _, ok := myLowUser[vMyUserRecommend.UserId]; ok {
-			if 2 <= len(myLowUser[vMyUserRecommend.UserId]) {
-				tmpTmpAreaMax := float64(0)
-				tmpTmpMaxId := int64(0)
-				for _, v := range myLowUser[vMyUserRecommend.UserId] {
-					if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount+usersMap[v.UserId].AmountUsdt {
-						tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
-						tmpTmpMaxId = v.UserId
-					}
-				}
-
-				tmpTmpAreaMin := float64(0)
-				for _, v := range myLowUser[vMyUserRecommend.UserId] {
-					if tmpTmpMaxId != v.UserId {
-						tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
-					}
-				}
-
-				if 3000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 1
-				} else if 7000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 2
-				} else if 21000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 3
-				} else if 63000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 4
-				} else if 190000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 5
-				} else if 570000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 6
-				} else if 1710000 <= tmpTmpAreaMin {
-					tmpCurrentLevel = 7
-				}
-			}
+		if 3000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 1
+		} else if 7000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 2
+		} else if 21000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 3
+		} else if 63000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 4
+		} else if 190000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 5
+		} else if 570000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 6
+		} else if 1710000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+			tmpCurrentLevel = 7
 		}
+
+		//if _, ok := myLowUser[vMyUserRecommend.UserId]; ok {
+		//	if 2 <= len(myLowUser[vMyUserRecommend.UserId]) {
+		//		tmpTmpAreaMax := float64(0)
+		//		tmpTmpMaxId := int64(0)
+		//		for _, v := range myLowUser[vMyUserRecommend.UserId] {
+		//			if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount+usersMap[v.UserId].AmountUsdt {
+		//				tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
+		//				tmpTmpMaxId = v.UserId
+		//			}
+		//		}
+		//
+		//		tmpTmpAreaMin := float64(0)
+		//		for _, v := range myLowUser[vMyUserRecommend.UserId] {
+		//			if tmpTmpMaxId != v.UserId {
+		//				tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
+		//			}
+		//		}
+		//	}
+		//}
 
 		res = append(res, &v1.RecommendListReply_List{
 			Address:   usersMap[vMyUserRecommend.UserId].Address,
@@ -1104,28 +1104,26 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	}
 
 	currentLevel := uint64(0)
-	if 2 <= len(myUserRecommend) {
-		if 3000 <= tmpAreaMin {
-			currentLevel = 1
-		} else if 7000 <= tmpAreaMin {
-			currentLevel = 2
-		} else if 21000 <= tmpAreaMin {
-			currentLevel = 3
-		} else if 63000 <= tmpAreaMin {
-			currentLevel = 4
-		} else if 190000 <= tmpAreaMin {
-			currentLevel = 5
-		} else if 570000 <= tmpAreaMin {
-			currentLevel = 6
-		} else if 1710000 <= tmpAreaMin {
-			currentLevel = 7
-		}
+	if 3000 <= user.MyTotalAmount {
+		currentLevel = 1
+	} else if 7000 <= user.MyTotalAmount {
+		currentLevel = 2
+	} else if 21000 <= user.MyTotalAmount {
+		currentLevel = 3
+	} else if 63000 <= user.MyTotalAmount {
+		currentLevel = 4
+	} else if 190000 <= user.MyTotalAmount {
+		currentLevel = 5
+	} else if 570000 <= user.MyTotalAmount {
+		currentLevel = 6
+	} else if 1710000 <= user.MyTotalAmount {
+		currentLevel = 7
 	}
 
 	return &v1.RecommendListReply{
 		AreaMax:       fmt.Sprintf("%.4f", tmpAreaMax),
 		AreaMin:       fmt.Sprintf("%.4f", tmpAreaMin),
-		TotalMyAmount: uint64(totalMyAmount),
+		TotalMyAmount: uint64(usersMap[user.ID].AmountUsdt),
 		MyLevel:       currentLevel,
 		TotalAmount:   fmt.Sprintf("%.4f", user.MyTotalAmount),
 		Recommends:    res,
