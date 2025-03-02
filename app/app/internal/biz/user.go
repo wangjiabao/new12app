@@ -1027,6 +1027,10 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	tmpAreaMax := float64(0)
 	tmpMaxId := int64(0)
 	for _, vMyUserRecommend := range myUserRecommend {
+		if _, ok := usersMap[vMyUserRecommend.UserId]; !ok {
+			continue
+		}
+
 		if tmpAreaMax < usersMap[vMyUserRecommend.UserId].MyTotalAmount+usersMap[vMyUserRecommend.UserId].AmountUsdt {
 			tmpAreaMax = usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdt
 			tmpMaxId = vMyUserRecommend.UserId
@@ -1947,9 +1951,8 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 	}
 
 	var (
-		users       []*User
-		usersMap    map[int64]*User
-		stopUserIds map[int64]bool
+		users    []*User
+		usersMap map[int64]*User
 	)
 	users, err = uuc.repo.GetAllUsers(ctx)
 	if nil == users {
@@ -2074,8 +2077,6 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 				}
 
 				if stopArea2 {
-					stopUserIds[tmpRecommendUser.ID] = true // 出局
-
 					// 推荐人
 					var (
 						userRecommendArea *UserRecommend
