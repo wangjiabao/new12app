@@ -689,6 +689,8 @@ components:
         BuyRequest_SendBody:
             type: object
             properties:
+                num:
+                    type: string
                 type:
                     type: string
                 sign:
@@ -834,6 +836,10 @@ components:
                 myLevel:
                     type: string
                 totalMyAmount:
+                    type: string
+                areaMin:
+                    type: string
+                areaMax:
                     type: string
                 totalAmount:
                     type: string

@@ -654,14 +654,14 @@ func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount
 				return errors.NotFound("user balance err", "user balance not found")
 			}
 			res2 := u.data.DB(ctx).Table("user").Where("id=?", userId).
-				Updates(map[string]interface{}{"amount_usdt": amount, "amount_usdt_origin": amountOrigin})
+				Updates(map[string]interface{}{"amount_usdt": gorm.Expr("amount_usdt + ?", amount), "amount_usdt_origin": gorm.Expr("amount_usdt_origin + ?", amountOrigin)})
 			if res2.Error != nil {
 				return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
 			}
 		} else {
 			buyTwo = "buy"
 			res2 := u.data.DB(ctx).Table("user").Where("id=?", userId).Where("amount>=?", amountOrigin).
-				Updates(map[string]interface{}{"amount_usdt": amount, "amount_usdt_origin": amountOrigin, "amount": gorm.Expr("amount - ?", amountOrigin)})
+				Updates(map[string]interface{}{"amount_usdt": gorm.Expr("amount_usdt + ?", amount), "amount_usdt_origin": gorm.Expr("amount_usdt_origin + ?", amountOrigin), "amount": gorm.Expr("amount - ?", amountOrigin)})
 			if res2.Error != nil {
 				return errors.New(500, "UPDATE_USER_ERROR", "用户信息修改失败")
 			}

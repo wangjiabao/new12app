@@ -1027,8 +1027,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	tmpAreaMax := float64(0)
 	tmpMaxId := int64(0)
 	for _, vMyUserRecommend := range myUserRecommend {
-		if tmpAreaMax < usersMap[vMyUserRecommend.UserId].MyTotalAmount+usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin {
-			tmpAreaMax = usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin
+		if tmpAreaMax < usersMap[vMyUserRecommend.UserId].MyTotalAmount+usersMap[vMyUserRecommend.UserId].AmountUsdt {
+			tmpAreaMax = usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdt
 			tmpMaxId = vMyUserRecommend.UserId
 		}
 	}
@@ -1051,7 +1051,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 
 		if tmpMaxId != vMyUserRecommend.UserId {
-			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdtOrigin
+			tmpAreaMin += usersMap[vMyUserRecommend.UserId].MyTotalAmount + usersMap[vMyUserRecommend.UserId].AmountUsdt
 		}
 
 		tmpCurrentLevel := uint64(0)
@@ -1060,8 +1060,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 				tmpTmpAreaMax := float64(0)
 				tmpTmpMaxId := int64(0)
 				for _, v := range myLowUser[vMyUserRecommend.UserId] {
-					if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount+usersMap[v.UserId].AmountUsdtOrigin {
-						tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdtOrigin
+					if tmpTmpAreaMax < usersMap[v.UserId].MyTotalAmount+usersMap[v.UserId].AmountUsdt {
+						tmpTmpAreaMax = usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
 						tmpTmpMaxId = v.UserId
 					}
 				}
@@ -1069,7 +1069,7 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 				tmpTmpAreaMin := float64(0)
 				for _, v := range myLowUser[vMyUserRecommend.UserId] {
 					if tmpTmpMaxId != v.UserId {
-						tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdtOrigin
+						tmpTmpAreaMin += usersMap[v.UserId].MyTotalAmount + usersMap[v.UserId].AmountUsdt
 					}
 				}
 
@@ -1119,6 +1119,8 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	}
 
 	return &v1.RecommendListReply{
+		AreaMax:       fmt.Sprintf("%.4f", tmpAreaMax),
+		AreaMin:       fmt.Sprintf("%.4f", tmpAreaMin),
 		TotalMyAmount: uint64(totalMyAmount),
 		MyLevel:       currentLevel,
 		TotalAmount:   fmt.Sprintf("%.4f", user.MyTotalAmount),
@@ -1735,7 +1737,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	goods, err = uuc.repo.GetGoods(ctx)
 	if nil != err {
 		return &v1.BuyReply{
-			Status: "余额错误",
+			Status: "商品错误",
 		}, nil
 	}
 
@@ -1751,6 +1753,10 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	}
 
 	amount := goodsMap[int64(req.SendBody.GoodId)].Amount
+
+	if 1 < req.SendBody.Num {
+		amount *= req.SendBody.Num
+	}
 
 	var (
 		userAddress []*UserAddress
@@ -2003,7 +2009,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 
 			if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
 				// 增加业绩
-				err = uuc.repo.UpdateUserMyTotalAmount(ctx, tmpUserId, float64(amount))
+				err = uuc.repo.UpdateUserMyTotalAmount(ctx, tmpUserId, float64(amountUsdt))
 				if err != nil {
 					fmt.Println("错误修改业绩认购：", err, v)
 				}

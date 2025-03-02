@@ -593,11 +593,11 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 	// TODO 验证签名
 	//password := fmt.Sprintf("%x", md5.Sum([]byte(req.SendBody.Password)))
 
-	if 0 < user.AmountUsdt {
-		return &v1.BuyReply{
-			Status: "已经认购",
-		}, nil
-	}
+	//if 0 < user.AmountUsdt {
+	//	return &v1.BuyReply{
+	//		Status: "已经认购",
+	//	}, nil
+	//}
 
 	return a.uuc.Buy(ctx, req, user)
 }

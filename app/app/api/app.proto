@@ -257,6 +257,7 @@ service App {
 
 message BuyRequest {
 	message SendBody{
+		uint64 num = 1;
 		uint64 type = 2;
 		string sign = 4;
 		string publicKey = 5;
@@ -553,6 +554,8 @@ message RecommendListRequest {
 message RecommendListReply {
 	uint64 myLevel = 1; // 等级
 	uint64 totalMyAmount = 3; // 个人业绩
+	string areaMin = 5;
+	string areaMax = 6;
 	string totalAmount = 4; // 团队总业绩
 	repeated List recommends = 2;
 	message List {
