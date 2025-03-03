@@ -10,8 +10,6 @@ import (
 	"dhb/app/app/internal/pkg/middleware/auth"
 	"encoding/json"
 	"fmt"
-	sdk "github.com/BioforestChain/go-bfmeta-wallet-sdk"
-	"github.com/BioforestChain/go-bfmeta-wallet-sdk/entity/jbase"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -59,41 +57,41 @@ func (a *AppService) EthAuthorize(ctx context.Context, req *v1.EthAuthorizeReque
 		}, nil
 	}
 
-	// 验证
-	var (
-		res     bool
-		address string
-		err     error
-	)
-
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || userAddress != address {
-		return &v1.EthAuthorizeReply{
-			Token:  "",
-			Status: "地址签名错误",
-		}, nil
-	}
-
 	//// 验证
 	//var (
-	//	res bool
-	//	err error
+	//	res     bool
+	//	address string
+	//	err     error
 	//)
-	//res, err = addressCheck(userAddress)
-	//if nil != err {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址验证失败")
-	//}
-	//if !res {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址格式错误")
-	//}
 	//
-	//var (
-	//	addressFromSign string
-	//)
-	//res, addressFromSign = verifySig(req.SendBody.Sign, []byte(userAddress))
-	//if !res || addressFromSign != userAddress {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || userAddress != address {
+	//	return &v1.EthAuthorizeReply{
+	//		Token:  "",
+	//		Status: "地址签名错误",
+	//	}, nil
 	//}
+
+	// 验证
+	var (
+		res bool
+		err error
+	)
+	res, err = addressCheck(userAddress)
+	if nil != err {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址验证失败")
+	}
+	if !res {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址格式错误")
+	}
+
+	var (
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(userAddress))
+	if !res || addressFromSign != userAddress {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	}
 
 	//if "" == req.SendBody.Password || 6 > len(req.SendBody.Password) {
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "账户密码必须大于6位")
@@ -375,26 +373,26 @@ func (a *AppService) Exchange(ctx context.Context, req *v1.ExchangeRequest) (*v1
 		}, nil
 	}
 
-	var (
-		address string
-		res     bool
-	)
-
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.ExchangeReply{
-			Status: "地址签名错误",
-		}, nil
-	}
-
 	//var (
-	//	res             bool
-	//	addressFromSign string
+	//	address string
+	//	res     bool
 	//)
-	//res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
-	//if !res || addressFromSign != user.Address {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.ExchangeReply{
+	//		Status: "地址签名错误",
+	//	}, nil
 	//}
+
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	}
 
 	return a.uuc.Exchange(ctx, req, &biz.User{
 		ID: userId,
@@ -444,16 +442,25 @@ func (a *AppService) CreateAddress(ctx context.Context, req *v1.CreateAddressReq
 		}, nil
 	}
 
-	var (
-		address string
-		res     bool
-	)
+	//var (
+	//	address string
+	//	res     bool
+	//)
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.CreateAddressReply{
+	//		Status: "地址签名错误",
+	//	}, nil
+	//}
 
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.CreateAddressReply{
-			Status: "地址签名错误",
-		}, nil
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
 	}
 
 	return a.uuc.CreateAddress(ctx, req, user)
@@ -502,16 +509,25 @@ func (a *AppService) UpdateAddress(ctx context.Context, req *v1.UpdateAddressReq
 		}, nil
 	}
 
-	var (
-		address string
-		res     bool
-	)
+	//var (
+	//	address string
+	//	res     bool
+	//)
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.UpdateAddressReply{
+	//		Status: "地址签名错误",
+	//	}, nil
+	//}
 
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.UpdateAddressReply{
-			Status: "地址签名错误",
-		}, nil
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
 	}
 
 	return a.uuc.UpdateAddress(ctx, req, user)
@@ -560,17 +576,17 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 		}, nil
 	}
 
-	var (
-		address string
-		res     bool
-	)
-
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.BuyReply{
-			Status: "地址签名错误",
-		}, nil
-	}
+	//var (
+	//	address string
+	//	res     bool
+	//)
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.BuyReply{
+	//		Status: "地址签名错误",
+	//	}, nil
+	//}
 
 	//fmt.Println(user)
 	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
@@ -578,14 +594,14 @@ func (a *AppService) Buy(ctx context.Context, req *v1.BuyRequest) (*v1.BuyReply,
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
 	//}
 
-	//var (
-	//	res             bool
-	//	addressFromSign string
-	//)
-	//res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
-	//if !res || addressFromSign != user.Address {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
-	//}
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	}
 
 	//if "" == req.SendBody.Password || 6 > len(req.SendBody.Password) {
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "账户密码必须大于6位")
@@ -649,17 +665,17 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "用户已冻结")
 	//}
 
-	var (
-		address string
-		res     bool
-	)
-
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.BuySuperReply{
-			Status: "地址签名错误",
-		}, nil
-	}
+	//var (
+	//	address string
+	//	res     bool
+	//)
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.BuySuperReply{
+	//		Status: "地址签名错误",
+	//	}, nil
+	//}
 
 	//fmt.Println(user)
 	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
@@ -667,14 +683,14 @@ func (a *AppService) BuySuper(ctx context.Context, req *v1.BuySuperRequest) (*v1
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
 	//}
 
-	//var (
-	//	res             bool
-	//	addressFromSign string
-	//)
-	//res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
-	//if !res || addressFromSign != user.Address {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
-	//}
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	}
 
 	//if "" == req.SendBody.Password || 6 > len(req.SendBody.Password) {
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "账户密码必须大于6位")
@@ -730,26 +746,26 @@ func (a *AppService) Withdraw(ctx context.Context, req *v1.WithdrawRequest) (*v1
 		}, nil
 	}
 
-	var (
-		address string
-		res     bool
-	)
-
-	res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
-	if !res || nil != err || 0 >= len(address) || user.Address != address {
-		return &v1.WithdrawReply{
-			Status: "地址签名错误",
-		}, nil
-	}
-
 	//var (
-	//	res             bool
-	//	addressFromSign string
+	//	address string
+	//	res     bool
 	//)
-	//res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
-	//if !res || addressFromSign != user.Address {
-	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	//
+	//res, address, err = verifySig2(req.SendBody.Sign, req.SendBody.PublicKey, "login")
+	//if !res || nil != err || 0 >= len(address) || user.Address != address {
+	//	return &v1.WithdrawReply{
+	//		Status: "地址签名错误",
+	//	}, nil
 	//}
+
+	var (
+		res             bool
+		addressFromSign string
+	)
+	res, addressFromSign = verifySig(req.SendBody.Sign, []byte(user.Address))
+	if !res || addressFromSign != user.Address {
+		return nil, errors.New(500, "AUTHORIZE_ERROR", "地址签名错误")
+	}
 
 	//if "" == req.SendBody.Password || 6 > len(req.SendBody.Password) {
 	//	return nil, errors.New(500, "AUTHORIZE_ERROR", "账户密码必须大于6位")
@@ -1290,45 +1306,45 @@ func verifySig(sigHex string, msg []byte) (bool, string) {
 	return verified, recoveredAddr.Hex()
 }
 
-var sdkClient = sdk.NewBCFWalletSDK()
-var bCFSignUtil = sdkClient.NewBCFSignUtil("b")
-
-func verifySig2(sigHex string, publicKey string, msg string) (bool, string, error) {
-	// 创建keyPair
-	//bCFSignUtil_CreateKeypair, _ := bCFSignUtil.CreateKeypair("abcd bcdd bcdva ccd")
-	//address2, _ := bCFSignUtil.GetAddressFromPublicKeyString(bCFSignUtil_CreateKeypair.PublicKey, "b")
-	//fmt.Println("secret:", bCFSignUtil_CreateKeypair.SecretKey, "publicKey", bCFSignUtil_CreateKeypair.PublicKey, "address:", address2)
-	//
-	//// 签名
-	//sign, _ := bCFSignUtil.SignToString("login", []byte(bCFSignUtil_CreateKeypair.SecretKey))
-	//fmt.Println("第一种签名方法的签名，sign:", sign)
-
-	var (
-		err     error
-		address string
-		res     bool
-	)
-	// 验证签名
-	msgTmp := jbase.NewUtf8StringBuffer(msg)
-	sigHexTmp := jbase.NewHexStringBuffer(sigHex)
-	publicKeyTmp := jbase.NewHexStringBuffer(publicKey)
-	//fmt.Println(msg, sigHex, publicKey)
-	res, err = bCFSignUtil.DetachedVerify(msgTmp.StringBuffer, sigHexTmp.StringBuffer, publicKeyTmp.StringBuffer)
-	//fmt.Println(222, res, err)
-	if !res {
-		return res, address, err
-	}
-
-	address, err = bCFSignUtil.GetAddressFromPublicKey(publicKeyTmp.StringBuffer, "b")
-	if nil != err {
-		return res, address, err
-	}
-	//fmt.Println(333, res, address, err)
-
-	if 0 > len(address) {
-		return false, "", nil
-	}
-
-	return res, address, err
-	//fmt.Println(res)
-}
+//var sdkClient = sdk.NewBCFWalletSDK()
+//var bCFSignUtil = sdkClient.NewBCFSignUtil("b")
+//
+//func verifySig2(sigHex string, publicKey string, msg string) (bool, string, error) {
+//	// 创建keyPair
+//	//bCFSignUtil_CreateKeypair, _ := bCFSignUtil.CreateKeypair("abcd bcdd bcdva ccd")
+//	//address2, _ := bCFSignUtil.GetAddressFromPublicKeyString(bCFSignUtil_CreateKeypair.PublicKey, "b")
+//	//fmt.Println("secret:", bCFSignUtil_CreateKeypair.SecretKey, "publicKey", bCFSignUtil_CreateKeypair.PublicKey, "address:", address2)
+//	//
+//	//// 签名
+//	//sign, _ := bCFSignUtil.SignToString("login", []byte(bCFSignUtil_CreateKeypair.SecretKey))
+//	//fmt.Println("第一种签名方法的签名，sign:", sign)
+//
+//	var (
+//		err     error
+//		address string
+//		res     bool
+//	)
+//	// 验证签名
+//	msgTmp := jbase.NewUtf8StringBuffer(msg)
+//	sigHexTmp := jbase.NewHexStringBuffer(sigHex)
+//	publicKeyTmp := jbase.NewHexStringBuffer(publicKey)
+//	//fmt.Println(msg, sigHex, publicKey)
+//	res, err = bCFSignUtil.DetachedVerify(msgTmp.StringBuffer, sigHexTmp.StringBuffer, publicKeyTmp.StringBuffer)
+//	//fmt.Println(222, res, err)
+//	if !res {
+//		return res, address, err
+//	}
+//
+//	address, err = bCFSignUtil.GetAddressFromPublicKey(publicKeyTmp.StringBuffer, "b")
+//	if nil != err {
+//		return res, address, err
+//	}
+//	//fmt.Println(333, res, address, err)
+//
+//	if 0 > len(address) {
+//		return false, "", nil
+//	}
+//
+//	return res, address, err
+//	//fmt.Println(res)
+//}

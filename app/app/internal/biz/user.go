@@ -454,18 +454,18 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 			}
 		}
 
-		// 创建私钥
-		var (
-			address    string
-			privateKey string
-		)
-		address, privateKey, err = generateKey()
-		if 0 >= len(address) || 0 >= len(privateKey) || err != nil {
-			return nil, errors.New(500, "USER_ERROR", "生成地址错误"), "生成地址错误"
-		}
-
-		u.PrivateKey = privateKey
-		u.AddressTwo = address
+		//// 创建私钥
+		//var (
+		//	address    string
+		//	privateKey string
+		//)
+		//address, privateKey, err = generateKey()
+		//if 0 >= len(address) || 0 >= len(privateKey) || err != nil {
+		//	return nil, errors.New(500, "USER_ERROR", "生成地址错误"), "生成地址错误"
+		//}
+		//
+		//u.PrivateKey = privateKey
+		//u.AddressTwo = address
 
 		//var (
 		//	addressThree    string
@@ -1796,11 +1796,15 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 			}, nil
 		}
 	} else {
-		if amount > user.Amount {
-			return &v1.BuyReply{
-				Status: "充值usdt余额不足",
-			}, nil
-		}
+		return &v1.BuyReply{
+			Status: "类型错误",
+		}, nil
+
+		//if amount > user.Amount {
+		//	return &v1.BuyReply{
+		//		Status: "充值usdt余额不足",
+		//	}, nil
+		//}
 	}
 
 	coinType = "USDT"
@@ -1830,52 +1834,56 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 }
 
 func (uuc *UserUseCase) BuySuper(ctx context.Context, req *v1.BuySuperRequest, user *User) (*v1.BuySuperReply, error) {
-	var (
-		err     error
-		configs []*Config
-		amount  = uint64(1000)
-		lockAll uint64
-	)
-
-	// 配置
-	configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "lock_all")
-	if nil != configs {
-		for _, vConfig := range configs {
-			if "lock_all" == vConfig.KeyName {
-				lockAll, _ = strconv.ParseUint(vConfig.Value, 10, 64)
-			}
-		}
-	}
-
-	if 1 == lockAll {
-		return &v1.BuySuperReply{
-			Status: "暂未开放",
-		}, nil
-	}
-
-	if amount > user.Amount {
-		return &v1.BuySuperReply{
-			Status: "充值usdt余额不足",
-		}, nil
-	}
-
-	if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
-		err = uuc.repo.UpdateUserNewSuper(ctx, user.ID, int64(amount))
-		if nil != err {
-			return err
-		}
-
-		return nil
-	}); nil != err {
-		fmt.Println(err, "错误投资3,super")
-		return &v1.BuySuperReply{
-			Status: "错误投资super",
-		}, err
-	}
-
 	return &v1.BuySuperReply{
-		Status: "ok",
+		Status: "错误",
 	}, nil
+
+	//var (
+	//	err     error
+	//	configs []*Config
+	//	amount  = uint64(1000)
+	//	lockAll uint64
+	//)
+	//
+	//// 配置
+	//configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "lock_all")
+	//if nil != configs {
+	//	for _, vConfig := range configs {
+	//		if "lock_all" == vConfig.KeyName {
+	//			lockAll, _ = strconv.ParseUint(vConfig.Value, 10, 64)
+	//		}
+	//	}
+	//}
+	//
+	//if 1 == lockAll {
+	//	return &v1.BuySuperReply{
+	//		Status: "暂未开放",
+	//	}, nil
+	//}
+	//
+	//if amount > user.Amount {
+	//	return &v1.BuySuperReply{
+	//		Status: "充值usdt余额不足",
+	//	}, nil
+	//}
+	//
+	//if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+	//	err = uuc.repo.UpdateUserNewSuper(ctx, user.ID, int64(amount))
+	//	if nil != err {
+	//		return err
+	//	}
+	//
+	//	return nil
+	//}); nil != err {
+	//	fmt.Println(err, "错误投资3,super")
+	//	return &v1.BuySuperReply{
+	//		Status: "错误投资super",
+	//	}, err
+	//}
+	//
+	//return &v1.BuySuperReply{
+	//	Status: "ok",
+	//}, nil
 }
 
 func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, buyType uint64, coinType string, addressId, goodId uint64, ethUserRecord ...*EthUserRecord) (bool, error) {

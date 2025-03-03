@@ -1047,8 +1047,8 @@ func (u *UserRepo) CreateUser(ctx context.Context, uc *biz.User) (*biz.User, err
 	user.Address = uc.Address
 	user.Password = uc.Password
 
-	user.AddressTwo = uc.AddressTwo
-	user.PrivateKey = uc.PrivateKey
+	//user.AddressTwo = uc.AddressTwo
+	//user.PrivateKey = uc.PrivateKey
 
 	//user.AddressThree = uc.AddressThree
 	//user.PrivateKeyThree = uc.PrivateKeyThree
