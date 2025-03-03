@@ -641,7 +641,7 @@ func (u *UserRepo) UpdateUserNewSuper(ctx context.Context, userId int64, amount 
 }
 
 // UpdateUserNewTwoNew .
-func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error {
+func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, num, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error {
 	if "USDT" == coinType {
 		buyTwo := "buy_two"
 		if 2 == buyType {
@@ -686,7 +686,7 @@ func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount
 		reward.UserId = userId
 		reward.AmountNew = float64(amountOrigin)
 		reward.Type = coinType // 本次分红的行为类型
-		reward.TypeRecordId = userBalanceRecode.ID
+		reward.TypeRecordId = int64(num)
 		reward.Reason = "buy" // 给我分红的理由
 		reward.LocationType = buyTwo
 		reward.Amount = int64(addressId)

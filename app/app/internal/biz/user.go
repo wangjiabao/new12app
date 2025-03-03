@@ -356,7 +356,7 @@ type UserInfoRepo interface {
 type UserRepo interface {
 	GetEthUserRecordListByUserId(ctx context.Context, userId int64) ([]*EthUserRecord, error)
 	InRecordNew(ctx context.Context, userId int64, address string, amount int64, coinType string) error
-	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
+	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, num, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
 	UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error
 	UpdateUserMyTotalAmount(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, userAddress string, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
@@ -1820,7 +1820,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	var (
 		res bool
 	)
-	res, err = uuc.EthUserRecordHandle(ctx, amount, buyType, coinType, req.SendBody.AddressId, req.SendBody.GoodId, notExistDepositResult...)
+	res, err = uuc.EthUserRecordHandle(ctx, amount, req.SendBody.Num, buyType, coinType, req.SendBody.AddressId, req.SendBody.GoodId, notExistDepositResult...)
 	if !res || nil != err {
 		fmt.Println(err)
 		return &v1.BuyReply{
@@ -1886,7 +1886,7 @@ func (uuc *UserUseCase) BuySuper(ctx context.Context, req *v1.BuySuperRequest, u
 	//}, nil
 }
 
-func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, buyType uint64, coinType string, addressId, goodId uint64, ethUserRecord ...*EthUserRecord) (bool, error) {
+func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount, num uint64, buyType uint64, coinType string, addressId, goodId uint64, ethUserRecord ...*EthUserRecord) (bool, error) {
 
 	var (
 		err              error
@@ -1980,7 +1980,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 
 		amountUsdt := amount * 70 / 100
 		if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
-			err = uuc.repo.UpdateUserNewTwoNew(ctx, v.UserId, float64(amountUsdt), amount, buyType, addressId, goodId, coinType)
+			err = uuc.repo.UpdateUserNewTwoNew(ctx, v.UserId, float64(amountUsdt), num, amount, buyType, addressId, goodId, coinType)
 			if nil != err {
 				return err
 			}
