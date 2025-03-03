@@ -391,6 +391,7 @@ message UserInfoReply {
 		string picName = 5;
 	}
 
+	bool buySuper = 111;
 	double bPrice = 1; // nana价格
 	string address = 2; // 地址
 	string inviteUserAddress = 11; // 我的直推人地址

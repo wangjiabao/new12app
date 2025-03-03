@@ -918,7 +918,14 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			CreatedAt: v.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 		})
 	}
+
+	buySuper := false
+	if 0 < myUser.AmountBiw {
+		buySuper = true
+	}
+
 	return &v1.UserInfoReply{
+		BuySuper:              buySuper,
 		VideoName:             videoName,
 		ListGoods:             listGoods,
 		BPrice:                bPrice,
