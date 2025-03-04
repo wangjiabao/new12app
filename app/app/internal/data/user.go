@@ -314,6 +314,7 @@ func (u *UserRepo) GetUserByAddress(ctx context.Context, address string) (*biz.U
 		IsDelete:      user.IsDelete,
 		AmountUsdt:    user.AmountUsdt,
 		MyTotalAmount: user.MyTotalAmount,
+		OutRate:       user.OutRate,
 	}, nil
 }
 

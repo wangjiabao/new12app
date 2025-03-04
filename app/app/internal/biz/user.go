@@ -33,6 +33,7 @@ type User struct {
 	Total                  uint64
 	IsDelete               int64
 	Out                    int64
+	OutRate                int64
 	RecommendLevel         int64
 	CreatedAt              time.Time
 	Lock                   int64
@@ -444,7 +445,9 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 			}
 
 			if 0 >= userRecommend.AmountUsdt {
-				return nil, errors.New(500, "USER_ERROR", "推荐人未入金"), "推荐人未入金"
+				if 0 >= userRecommend.OutRate {
+					return nil, errors.New(500, "USER_ERROR", "推荐人未入金"), "推荐人未入金"
+				}
 			}
 
 			// 查询推荐人的相关信息
