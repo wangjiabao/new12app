@@ -1164,6 +1164,8 @@ components:
                     type: string
                 picName:
                     type: string
+                status:
+                    type: string
         UserInfoReply_ListReward:
             type: object
             properties:

@@ -389,6 +389,7 @@ message UserInfoReply {
 		string detail = 3;
 		uint64 amount = 4;
 		string picName = 5;
+		uint64 status = 6;
 	}
 
 	bool buySuper = 111;

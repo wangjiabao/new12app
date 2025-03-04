@@ -1095,7 +1095,7 @@ func (u *UserRepo) GetVideos(ctx context.Context) ([]*biz.Video, error) {
 func (u *UserRepo) GetGoods(ctx context.Context) ([]*biz.Goods, error) {
 	var goods []*Goods
 	res := make([]*biz.Goods, 0)
-	if err := u.data.db.Where("status=?", 1).Table("goods").Find(&goods).Error; err != nil {
+	if err := u.data.db.Table("goods").Find(&goods).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

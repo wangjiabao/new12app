@@ -722,6 +722,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			Detail:  v.Detail,
 			Amount:  v.Amount,
 			PicName: v.PicName,
+			Status:  v.Status,
 		})
 	}
 
@@ -1755,6 +1756,9 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 
 	goodsMap = make(map[int64]*Goods, 0)
 	for _, v := range goods {
+		if 1 != v.Status {
+			continue
+		}
 		goodsMap[v.ID] = v
 	}
 
