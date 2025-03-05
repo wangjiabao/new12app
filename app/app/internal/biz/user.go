@@ -2155,13 +2155,21 @@ func (uuc *UserUseCase) Exchange(ctx context.Context, req *v1.ExchangeRequest, u
 
 	userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
 	if nil != err {
-		return nil, err
+		return &v1.ExchangeReply{
+			Status: "错误",
+		}, nil
 	}
 
 	amountFloat, _ := strconv.ParseFloat(req.SendBody.Amount, 10)
 
 	if userBalance.BalanceUsdtFloat < amountFloat {
 		amountFloat = userBalance.BalanceUsdtFloat
+	}
+
+	if 1 > amountFloat {
+		return &v1.ExchangeReply{
+			Status: "错误金额",
+		}, nil
 	}
 
 	// 配置
@@ -2201,7 +2209,9 @@ func (uuc *UserUseCase) Exchange(ctx context.Context, req *v1.ExchangeRequest, u
 
 		return nil
 	}); nil != err {
-		return nil, err
+		return &v1.ExchangeReply{
+			Status: "错误",
+		}, nil
 	}
 
 	return &v1.ExchangeReply{
@@ -2218,10 +2228,20 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
 	if nil != err {
-		return nil, err
+		return &v1.WithdrawReply{
+			Status: "错误",
+		}, nil
 	}
 
 	amountFloat := float64(req.SendBody.Amount)
+
+	if 1 > amountFloat {
+		if nil != err {
+			return &v1.WithdrawReply{
+				Status: "错误金额",
+			}, nil
+		}
+	}
 
 	// 配置
 	var (
