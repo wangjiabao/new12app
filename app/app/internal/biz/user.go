@@ -2163,7 +2163,9 @@ func (uuc *UserUseCase) Exchange(ctx context.Context, req *v1.ExchangeRequest, u
 	amountFloat, _ := strconv.ParseFloat(req.SendBody.Amount, 10)
 
 	if userBalance.BalanceUsdtFloat < amountFloat {
-		amountFloat = userBalance.BalanceUsdtFloat
+		return &v1.ExchangeReply{
+			Status: "余额不足",
+		}, nil
 	}
 
 	if 1 > amountFloat {
@@ -2277,7 +2279,9 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	if "usdt" == req.SendBody.Type {
 		if userBalance.BalanceUsdtFloat < amountFloat {
-			amountFloat = userBalance.BalanceUsdtFloat
+			return &v1.WithdrawReply{
+				Status: "余额不足",
+			}, nil
 		}
 
 		if withdrawMax < amountFloat {
@@ -2294,7 +2298,9 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	} else {
 		if userBalance.BalanceRawFloat < amountFloat {
-			amountFloat = userBalance.BalanceRawFloat
+			return &v1.WithdrawReply{
+				Status: "余额不足",
+			}, nil
 		}
 
 		if withdrawMaxNana < amountFloat {
