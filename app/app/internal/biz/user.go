@@ -1059,17 +1059,17 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 		}
 
 		tmpCurrentLevel := uint64(0)
-		if 3000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		if 3000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 7000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 1
-		} else if 7000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		} else if 7000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 21000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 2
-		} else if 21000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		} else if 21000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 63000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 3
-		} else if 63000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		} else if 63000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 190000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 4
-		} else if 190000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		} else if 190000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 570000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 5
-		} else if 570000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
+		} else if 570000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount && 1710000 > usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 6
 		} else if 1710000 <= usersMap[vMyUserRecommend.UserId].MyTotalAmount {
 			tmpCurrentLevel = 7
@@ -1104,17 +1104,17 @@ func (uuc *UserUseCase) UserRecommend(ctx context.Context, req *v1.RecommendList
 	}
 
 	currentLevel := uint64(0)
-	if 3000 <= user.MyTotalAmount {
+	if 3000 <= user.MyTotalAmount && 7000 > user.MyTotalAmount {
 		currentLevel = 1
-	} else if 7000 <= user.MyTotalAmount {
+	} else if 7000 <= user.MyTotalAmount && 21000 > user.MyTotalAmount {
 		currentLevel = 2
-	} else if 21000 <= user.MyTotalAmount {
+	} else if 21000 <= user.MyTotalAmount && 63000 > user.MyTotalAmount {
 		currentLevel = 3
-	} else if 63000 <= user.MyTotalAmount {
+	} else if 63000 <= user.MyTotalAmount && 190000 > user.MyTotalAmount {
 		currentLevel = 4
-	} else if 190000 <= user.MyTotalAmount {
+	} else if 190000 <= user.MyTotalAmount && 570000 > user.MyTotalAmount {
 		currentLevel = 5
-	} else if 570000 <= user.MyTotalAmount {
+	} else if 570000 <= user.MyTotalAmount && 1710000 > user.MyTotalAmount {
 		currentLevel = 6
 	} else if 1710000 <= user.MyTotalAmount {
 		currentLevel = 7
