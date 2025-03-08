@@ -314,6 +314,7 @@ func (u *UserRepo) GetUserByAddress(ctx context.Context, address string) (*biz.U
 		IsDelete:      user.IsDelete,
 		AmountUsdt:    user.AmountUsdt,
 		MyTotalAmount: user.MyTotalAmount,
+		OutRate:       user.OutRate,
 	}, nil
 }
 
@@ -641,7 +642,7 @@ func (u *UserRepo) UpdateUserNewSuper(ctx context.Context, userId int64, amount 
 }
 
 // UpdateUserNewTwoNew .
-func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error {
+func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, num, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error {
 	if "USDT" == coinType {
 		buyTwo := "buy_two"
 		if 2 == buyType {
@@ -686,7 +687,7 @@ func (u *UserRepo) UpdateUserNewTwoNew(ctx context.Context, userId int64, amount
 		reward.UserId = userId
 		reward.AmountNew = float64(amountOrigin)
 		reward.Type = coinType // 本次分红的行为类型
-		reward.TypeRecordId = userBalanceRecode.ID
+		reward.TypeRecordId = int64(num)
 		reward.Reason = "buy" // 给我分红的理由
 		reward.LocationType = buyTwo
 		reward.Amount = int64(addressId)
@@ -1047,8 +1048,8 @@ func (u *UserRepo) CreateUser(ctx context.Context, uc *biz.User) (*biz.User, err
 	user.Address = uc.Address
 	user.Password = uc.Password
 
-	user.AddressTwo = uc.AddressTwo
-	user.PrivateKey = uc.PrivateKey
+	//user.AddressTwo = uc.AddressTwo
+	//user.PrivateKey = uc.PrivateKey
 
 	//user.AddressThree = uc.AddressThree
 	//user.PrivateKeyThree = uc.PrivateKeyThree
@@ -1094,7 +1095,7 @@ func (u *UserRepo) GetVideos(ctx context.Context) ([]*biz.Video, error) {
 func (u *UserRepo) GetGoods(ctx context.Context) ([]*biz.Goods, error) {
 	var goods []*Goods
 	res := make([]*biz.Goods, 0)
-	if err := u.data.db.Where("status=?", 1).Table("goods").Find(&goods).Error; err != nil {
+	if err := u.data.db.Table("goods").Find(&goods).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

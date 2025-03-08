@@ -1038,6 +1038,8 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/UserInfoReply_ListGoods'
+                buySuper:
+                    type: boolean
                 bPrice:
                     type: number
                     format: double
@@ -1161,6 +1163,8 @@ components:
                 amount:
                     type: string
                 picName:
+                    type: string
+                status:
                     type: string
         UserInfoReply_ListReward:
             type: object

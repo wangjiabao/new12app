@@ -33,6 +33,7 @@ type User struct {
 	Total                  uint64
 	IsDelete               int64
 	Out                    int64
+	OutRate                int64
 	RecommendLevel         int64
 	CreatedAt              time.Time
 	Lock                   int64
@@ -356,7 +357,7 @@ type UserInfoRepo interface {
 type UserRepo interface {
 	GetEthUserRecordListByUserId(ctx context.Context, userId int64) ([]*EthUserRecord, error)
 	InRecordNew(ctx context.Context, userId int64, address string, amount int64, coinType string) error
-	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
+	UpdateUserNewTwoNew(ctx context.Context, userId int64, amount float64, num, amountOrigin uint64, buyType, addressId, goodId uint64, coinType string) error
 	UpdateUserNewSuper(ctx context.Context, userId int64, amount int64) error
 	UpdateUserMyTotalAmount(ctx context.Context, userId int64, amountUsdt float64) error
 	UpdateUserRewardRecommend(ctx context.Context, userId, recommendUserId int64, userAddress string, amountUsdtAll float64, amountUsdt float64, amountNana float64, amountUsdtOrigin float64, recommendTwo, stop bool) (int64, error)
@@ -444,7 +445,9 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 			}
 
 			if 0 >= userRecommend.AmountUsdt {
-				return nil, errors.New(500, "USER_ERROR", "推荐人未入金"), "推荐人未入金"
+				if 0 >= userRecommend.OutRate {
+					return nil, errors.New(500, "USER_ERROR", "推荐人未入金"), "推荐人未入金"
+				}
 			}
 
 			// 查询推荐人的相关信息
@@ -454,18 +457,18 @@ func (uuc *UserUseCase) GetExistUserByAddressOrCreate(ctx context.Context, u *Us
 			}
 		}
 
-		// 创建私钥
-		var (
-			address    string
-			privateKey string
-		)
-		address, privateKey, err = generateKey()
-		if 0 >= len(address) || 0 >= len(privateKey) || err != nil {
-			return nil, errors.New(500, "USER_ERROR", "生成地址错误"), "生成地址错误"
-		}
-
-		u.PrivateKey = privateKey
-		u.AddressTwo = address
+		//// 创建私钥
+		//var (
+		//	address    string
+		//	privateKey string
+		//)
+		//address, privateKey, err = generateKey()
+		//if 0 >= len(address) || 0 >= len(privateKey) || err != nil {
+		//	return nil, errors.New(500, "USER_ERROR", "生成地址错误"), "生成地址错误"
+		//}
+		//
+		//u.PrivateKey = privateKey
+		//u.AddressTwo = address
 
 		//var (
 		//	addressThree    string
@@ -719,6 +722,7 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			Detail:  v.Detail,
 			Amount:  v.Amount,
 			PicName: v.PicName,
+			Status:  v.Status,
 		})
 	}
 
@@ -918,7 +922,14 @@ func (uuc *UserUseCase) UserInfo(ctx context.Context, user *User) (*v1.UserInfoR
 			CreatedAt: v.CreatedAt.Add(8 * time.Hour).Format("2006-01-02 15:04:05"),
 		})
 	}
+
+	buySuper := false
+	if 0 < myUser.AmountBiw {
+		buySuper = true
+	}
+
 	return &v1.UserInfoReply{
+		BuySuper:              buySuper,
 		VideoName:             videoName,
 		ListGoods:             listGoods,
 		BPrice:                bPrice,
@@ -1745,6 +1756,9 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 
 	goodsMap = make(map[int64]*Goods, 0)
 	for _, v := range goods {
+		if 1 != v.Status {
+			continue
+		}
 		goodsMap[v.ID] = v
 	}
 
@@ -1796,11 +1810,15 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 			}, nil
 		}
 	} else {
-		if amount > user.Amount {
-			return &v1.BuyReply{
-				Status: "充值usdt余额不足",
-			}, nil
-		}
+		return &v1.BuyReply{
+			Status: "类型错误",
+		}, nil
+
+		//if amount > user.Amount {
+		//	return &v1.BuyReply{
+		//		Status: "充值usdt余额不足",
+		//	}, nil
+		//}
 	}
 
 	coinType = "USDT"
@@ -1816,7 +1834,7 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 	var (
 		res bool
 	)
-	res, err = uuc.EthUserRecordHandle(ctx, amount, buyType, coinType, req.SendBody.AddressId, req.SendBody.GoodId, notExistDepositResult...)
+	res, err = uuc.EthUserRecordHandle(ctx, amount, req.SendBody.Num, buyType, coinType, req.SendBody.AddressId, req.SendBody.GoodId, notExistDepositResult...)
 	if !res || nil != err {
 		fmt.Println(err)
 		return &v1.BuyReply{
@@ -1830,55 +1848,59 @@ func (uuc *UserUseCase) Buy(ctx context.Context, req *v1.BuyRequest, user *User)
 }
 
 func (uuc *UserUseCase) BuySuper(ctx context.Context, req *v1.BuySuperRequest, user *User) (*v1.BuySuperReply, error) {
-	var (
-		err     error
-		configs []*Config
-		amount  = uint64(1000)
-		lockAll uint64
-	)
-
-	// 配置
-	configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "lock_all")
-	if nil != configs {
-		for _, vConfig := range configs {
-			if "lock_all" == vConfig.KeyName {
-				lockAll, _ = strconv.ParseUint(vConfig.Value, 10, 64)
-			}
-		}
-	}
-
-	if 1 == lockAll {
-		return &v1.BuySuperReply{
-			Status: "暂未开放",
-		}, nil
-	}
-
-	if amount > user.Amount {
-		return &v1.BuySuperReply{
-			Status: "充值usdt余额不足",
-		}, nil
-	}
-
-	if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
-		err = uuc.repo.UpdateUserNewSuper(ctx, user.ID, int64(amount))
-		if nil != err {
-			return err
-		}
-
-		return nil
-	}); nil != err {
-		fmt.Println(err, "错误投资3,super")
-		return &v1.BuySuperReply{
-			Status: "错误投资super",
-		}, err
-	}
-
 	return &v1.BuySuperReply{
-		Status: "ok",
+		Status: "错误",
 	}, nil
+
+	//var (
+	//	err     error
+	//	configs []*Config
+	//	amount  = uint64(1000)
+	//	lockAll uint64
+	//)
+	//
+	//// 配置
+	//configs, _ = uuc.configRepo.GetConfigByKeys(ctx, "lock_all")
+	//if nil != configs {
+	//	for _, vConfig := range configs {
+	//		if "lock_all" == vConfig.KeyName {
+	//			lockAll, _ = strconv.ParseUint(vConfig.Value, 10, 64)
+	//		}
+	//	}
+	//}
+	//
+	//if 1 == lockAll {
+	//	return &v1.BuySuperReply{
+	//		Status: "暂未开放",
+	//	}, nil
+	//}
+	//
+	//if amount > user.Amount {
+	//	return &v1.BuySuperReply{
+	//		Status: "充值usdt余额不足",
+	//	}, nil
+	//}
+	//
+	//if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
+	//	err = uuc.repo.UpdateUserNewSuper(ctx, user.ID, int64(amount))
+	//	if nil != err {
+	//		return err
+	//	}
+	//
+	//	return nil
+	//}); nil != err {
+	//	fmt.Println(err, "错误投资3,super")
+	//	return &v1.BuySuperReply{
+	//		Status: "错误投资super",
+	//	}, err
+	//}
+	//
+	//return &v1.BuySuperReply{
+	//	Status: "ok",
+	//}, nil
 }
 
-func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, buyType uint64, coinType string, addressId, goodId uint64, ethUserRecord ...*EthUserRecord) (bool, error) {
+func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount, num uint64, buyType uint64, coinType string, addressId, goodId uint64, ethUserRecord ...*EthUserRecord) (bool, error) {
 
 	var (
 		err              error
@@ -1972,7 +1994,7 @@ func (uuc *UserUseCase) EthUserRecordHandle(ctx context.Context, amount uint64, 
 
 		amountUsdt := amount * 70 / 100
 		if err = uuc.tx.ExecTx(ctx, func(ctx context.Context) error { // 事务
-			err = uuc.repo.UpdateUserNewTwoNew(ctx, v.UserId, float64(amountUsdt), amount, buyType, addressId, goodId, coinType)
+			err = uuc.repo.UpdateUserNewTwoNew(ctx, v.UserId, float64(amountUsdt), num, amount, buyType, addressId, goodId, coinType)
 			if nil != err {
 				return err
 			}
@@ -2133,13 +2155,23 @@ func (uuc *UserUseCase) Exchange(ctx context.Context, req *v1.ExchangeRequest, u
 
 	userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
 	if nil != err {
-		return nil, err
+		return &v1.ExchangeReply{
+			Status: "错误",
+		}, nil
 	}
 
 	amountFloat, _ := strconv.ParseFloat(req.SendBody.Amount, 10)
 
 	if userBalance.BalanceUsdtFloat < amountFloat {
-		amountFloat = userBalance.BalanceUsdtFloat
+		return &v1.ExchangeReply{
+			Status: "余额不足",
+		}, nil
+	}
+
+	if 1 > amountFloat {
+		return &v1.ExchangeReply{
+			Status: "错误金额",
+		}, nil
 	}
 
 	// 配置
@@ -2179,7 +2211,9 @@ func (uuc *UserUseCase) Exchange(ctx context.Context, req *v1.ExchangeRequest, u
 
 		return nil
 	}); nil != err {
-		return nil, err
+		return &v1.ExchangeReply{
+			Status: "错误",
+		}, nil
 	}
 
 	return &v1.ExchangeReply{
@@ -2196,10 +2230,20 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	userBalance, err = uuc.ubRepo.GetUserBalance(ctx, user.ID)
 	if nil != err {
-		return nil, err
+		return &v1.WithdrawReply{
+			Status: "错误",
+		}, nil
 	}
 
 	amountFloat := float64(req.SendBody.Amount)
+
+	if 1 > amountFloat {
+		if nil != err {
+			return &v1.WithdrawReply{
+				Status: "错误金额",
+			}, nil
+		}
+	}
 
 	// 配置
 	var (
@@ -2235,7 +2279,9 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	if "usdt" == req.SendBody.Type {
 		if userBalance.BalanceUsdtFloat < amountFloat {
-			amountFloat = userBalance.BalanceUsdtFloat
+			return &v1.WithdrawReply{
+				Status: "余额不足",
+			}, nil
 		}
 
 		if withdrawMax < amountFloat {
@@ -2252,7 +2298,9 @@ func (uuc *UserUseCase) Withdraw(ctx context.Context, req *v1.WithdrawRequest, u
 
 	} else {
 		if userBalance.BalanceRawFloat < amountFloat {
-			amountFloat = userBalance.BalanceRawFloat
+			return &v1.WithdrawReply{
+				Status: "余额不足",
+			}, nil
 		}
 
 		if withdrawMaxNana < amountFloat {
